@@ -14,6 +14,8 @@ export interface AdminUser {
   id: string
   name: string
   email: string
+  /** 手机号（联系方式，可为空） */
+  phone: string | null
   role: 'SUPER_ADMIN' | 'ADMIN'
   is_super_admin: boolean
   status: 'ACTIVE' | 'DISABLED'
@@ -58,7 +60,14 @@ export interface LoginPayload {
 export interface RegisterPayload {
   name: string
   email: string
+  phone?: string
   code: string
   password: string
   password_confirm: string
+}
+
+/** 更新自身资料（姓名、手机号） */
+export interface UpdateProfilePayload {
+  name: string
+  phone: string
 }

@@ -50,6 +50,7 @@ Body（JSON）：
       "id": "370893497273683968",
       "name": "张伟",
       "email": "admin@example.com",
+      "phone": "13800138000",
       "role": "SUPER_ADMIN",
       "is_super_admin": true,
       "status": "ACTIVE",

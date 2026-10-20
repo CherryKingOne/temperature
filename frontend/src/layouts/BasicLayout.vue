@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-import UiIcon from '@/components/ui/UiIcon.vue'
+import FaIcon from '@/components/ui/FaIcon.vue'
 import UserMenu from '@/components/ui/UserMenu.vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -43,9 +43,9 @@ onMounted(async () => {
     <header class="layout__navbar">
       <div class="layout__navbar-left">
         <button class="layout__collapse" title="收起/展开菜单" @click="collapsed = !collapsed">
-          <UiIcon name="menu" :size="18" />
+          <FaIcon name="bars" :size="18" />
         </button>
-        <span class="layout__logo"><UiIcon name="bar-chart" :size="18" /></span>
+        <span class="layout__logo"><FaIcon name="bar-chart" :size="18" /></span>
         <span class="layout__title">Temperature 平台</span>
       </div>
 
@@ -64,11 +64,11 @@ onMounted(async () => {
             :to="item.path"
             :title="item.title"
           >
-            <UiIcon :name="item.icon" :size="16" />
+            <FaIcon :name="item.icon" :size="16" />
             <span class="layout__menu-text">{{ item.title }}</span>
           </router-link>
           <div v-else class="layout__menu-item is-disabled" :title="`${item.title}（功能开发中）`">
-            <UiIcon :name="item.icon" :size="16" />
+            <FaIcon :name="item.icon" :size="16" />
             <span class="layout__menu-text">{{ item.title }}</span>
           </div>
         </template>
@@ -78,7 +78,7 @@ onMounted(async () => {
     <main class="layout__content">
       <div class="tabs">
         <div class="tabs__item is-active">
-          <UiIcon name="home" :size="13" />
+          <FaIcon name="home" :size="13" />
           {{ currentTitle }}
         </div>
       </div>

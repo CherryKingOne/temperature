@@ -7,7 +7,7 @@ import { sendEmailCode } from '@/api/admin/auth'
 import AuthLayout from '@/components/auth/AuthLayout.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
-import UiIcon from '@/components/ui/UiIcon.vue'
+import FaIcon from '@/components/ui/FaIcon.vue'
 import { useCountdown } from '@/composables/useCountdown'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
@@ -21,6 +21,7 @@ const toast = useToastStore()
 
 const name = ref('')
 const email = ref('')
+const phone = ref('')
 const code = ref('')
 const password = ref('')
 const passwordConfirm = ref('')
@@ -100,6 +101,7 @@ async function onSubmit(): Promise<void> {
     await auth.register({
       name: name.value.trim(),
       email: email.value.trim(),
+      phone: phone.value.trim(),
       code: code.value.trim(),
       password: password.value,
       password_confirm: passwordConfirm.value,
@@ -118,7 +120,7 @@ async function onSubmit(): Promise<void> {
   <AuthLayout title="账号注册" subtitle="首个注册账号将自动成为超级管理员">
     <form class="form" novalidate @submit.prevent="onSubmit">
       <div v-if="errorMessage" class="auth__error">
-        <UiIcon name="alert-circle" :size="15" />
+        <FaIcon name="exclamation-circle" :size="15" />
         <span>{{ errorMessage }}</span>
       </div>
 
@@ -147,6 +149,17 @@ async function onSubmit(): Promise<void> {
           autocomplete="email"
         />
         <p v-if="errors.email" class="form-item__error">{{ errors.email }}</p>
+      </div>
+
+      <div class="form-item">
+        <label class="form-item__label" for="register-phone">手机号</label>
+        <BaseInput
+          id="register-phone"
+          v-model="phone"
+          icon="user"
+          placeholder="用于日常联系，可留空"
+          autocomplete="tel"
+        />
       </div>
 
       <div class="form-item">

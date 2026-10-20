@@ -22,6 +22,7 @@ from app.schemas.admin.auth import (
     ResetPasswordRequest,
     SendEmailCodeRequest,
     SendEmailCodeResponse,
+    UpdateProfileRequest,
 )
 from app.services.admin.auth_service import AuthService
 
@@ -122,6 +123,21 @@ async def get_current_admin_info(
 ) -> ApiResponse[AdminUserOut]:
     data = await service.get_current_admin(admin.id)
     return ApiResponse(data=data)
+
+
+@router.patch(
+    "/profile",
+    response_model=ApiResponse[AdminUserOut],
+    summary="修改自身资料",
+    status_code=status.HTTP_200_OK,
+)
+async def update_profile(
+    payload: UpdateProfileRequest,
+    service: Annotated[AuthService, Depends(get_auth_service)],
+    admin: Annotated[AdminUser, Depends(get_current_admin)],
+) -> ApiResponse[AdminUserOut]:
+    data = await service.update_profile(admin, payload)
+    return ApiResponse(data=data, message="资料已更新")
 
 
 @router.post(

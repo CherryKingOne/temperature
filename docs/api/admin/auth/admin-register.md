@@ -22,6 +22,7 @@ Body（JSON）：
 | --- | --- | --- | --- | --- |
 | `name` | string | 是 | 长度 2–50 个字符 | 姓名，管理员显示名称 |
 | `email` | string | 是 | 合法邮箱，最长 254 字符 | 登录账号，服务端统一转小写，唯一 |
+| `phone` | string | 否 | 最长 20 字符 | 手机号（联系方式，可空，服务端会去掉空格与分隔符） |
 | `code` | string | 是 | 6 位纯数字 | 邮箱验证码，需与 `scene=register` 的验证码匹配 |
 | `password` | string | 是 | 长度 8–72 字节 | 登录密码 |
 | `password_confirm` | string | 是 | 长度 8–72 字节 | 确认密码，必须与 `password` 一致 |
@@ -32,6 +33,7 @@ Body（JSON）：
 {
   "name": "张伟",
   "email": "admin@example.com",
+  "phone": "13800138000",
   "code": "123456",
   "password": "Abcd@1234",
   "password_confirm": "Abcd@1234"
@@ -50,6 +52,7 @@ Body（JSON）：
     "id": "370893497273683968",
     "name": "张伟",
     "email": "admin@example.com",
+  "phone": "13800138000",
     "role": "SUPER_ADMIN",
     "is_super_admin": true,
     "status": "ACTIVE",
@@ -111,6 +114,7 @@ curl -X POST 'http://127.0.0.1:8000/api/admin/auth/register' \
   -d '{
     "name": "张伟",
     "email": "admin@example.com",
+  "phone": "13800138000",
     "code": "123456",
     "password": "Abcd@1234",
     "password_confirm": "Abcd@1234"

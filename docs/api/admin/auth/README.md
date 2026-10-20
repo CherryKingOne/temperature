@@ -12,6 +12,7 @@
 | [admin-refresh-token.md](./admin-refresh-token.md) | POST | `/api/admin/auth/refresh-token` | 否 | 刷新访问令牌（轮换刷新令牌） |
 | [admin-logout.md](./admin-logout.md) | POST | `/api/admin/auth/logout` | 是 | 登出并吊销当前会话 |
 | [admin-get-current-admin.md](./admin-get-current-admin.md) | GET | `/api/admin/auth/me` | 是 | 获取当前管理员信息 |
+| [admin-update-profile.md](./admin-update-profile.md) | PATCH | `/api/admin/auth/profile` | 是 | 修改自身资料（姓名、手机号） |
 | [admin-change-password.md](./admin-change-password.md) | POST | `/api/admin/auth/change-password` | 是 | 修改自身密码 |
 | [admin-reset-password.md](./admin-reset-password.md) | POST | `/api/admin/auth/reset-password` | 否 | 忘记密码时重置密码 |
 

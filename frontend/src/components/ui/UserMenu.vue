@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import ThemeSwitcher from './ThemeSwitcher.vue'
-import UiIcon from './UiIcon.vue'
+import FaIcon from './FaIcon.vue'
 
 /**
  * 账号菜单：点击头像展开下拉卡片（个人中心 / 退出登录）
@@ -65,7 +65,7 @@ async function onLogout(): Promise<void> {
       <span class="user-menu__avatar">{{ initial() }}</span>
       <span class="user-menu__name">{{ auth.admin?.name ?? '管理员' }}</span>
       <em v-if="auth.isSuperAdmin" class="user-menu__role">超级管理员</em>
-      <UiIcon class="user-menu__arrow" name="chevron-down" :size="12" />
+      <FaIcon class="user-menu__arrow" name="chevron-down" :size="12" />
     </button>
 
     <transition name="user-menu">
@@ -88,12 +88,12 @@ async function onLogout(): Promise<void> {
         <div class="user-menu__divider" />
 
         <router-link class="user-menu__item" to="/profile" @click="close">
-          <UiIcon name="user" :size="15" />
+          <FaIcon name="user" :size="15" />
           <span>个人中心</span>
         </router-link>
 
         <button class="user-menu__item user-menu__item--danger" @click="onLogout">
-          <UiIcon name="arrow-right" :size="15" />
+          <FaIcon name="arrow-right" :size="15" />
           <span>退出登录</span>
         </button>
       </div>

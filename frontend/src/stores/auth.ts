@@ -6,9 +6,10 @@ import {
   login as loginApi,
   logout as logoutApi,
   register as registerApi,
+  updateProfile as updateProfileApi,
 } from '@/api/admin/auth'
 import { ApiError, getToken, setToken } from '@/api/client'
-import type { AdminUser, LoginPayload, RegisterPayload } from '@/types/api'
+import type { AdminUser, LoginPayload, RegisterPayload, UpdateProfilePayload } from '@/types/api'
 import { isTokenExpired } from '@/utils/token'
 
 /** 读取本地令牌；已过期的令牌直接作废 */
@@ -55,6 +56,13 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /** 修改自身资料（姓名、手机号） */
+  async function updateProfile(payload: UpdateProfilePayload): Promise<AdminUser> {
+    const user = await updateProfileApi(payload)
+    admin.value = user
+    return user
+  }
+
   /** 清空本地登录态（不改服务端数据） */
   function clearSession(): void {
     token.value = null
@@ -78,6 +86,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     loadCurrentAdmin,
+    updateProfile,
     clearSession,
     logout,
   }

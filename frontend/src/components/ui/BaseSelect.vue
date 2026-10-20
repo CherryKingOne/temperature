@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UiIcon from './UiIcon.vue'
+import FaIcon from './FaIcon.vue'
 
 export interface SelectOption {
   label: string
@@ -44,6 +44,6 @@ function onChange(event: Event): void {
         {{ item.label }}
       </option>
     </select>
-    <UiIcon class="select__arrow" name="chevron-down" :size="14" />
+    <FaIcon class="select__arrow" name="chevron-down" :size="14" />
   </div>
 </template>

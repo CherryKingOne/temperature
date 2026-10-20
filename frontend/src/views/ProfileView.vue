@@ -6,7 +6,7 @@ import { ApiError } from '@/api/client'
 import { changePassword, sendEmailCode } from '@/api/admin/auth'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
-import UiIcon from '@/components/ui/UiIcon.vue'
+import FaIcon from '@/components/ui/FaIcon.vue'
 import { useCountdown } from '@/composables/useCountdown'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
@@ -118,6 +118,55 @@ async function onSubmit(): Promise<void> {
     submitting.value = false
   }
 }
+
+// ------------------------------------------------------------------
+// 行内编辑（姓名 / 手机号 各自独立）
+// ------------------------------------------------------------------
+type EditField = 'name' | 'phone'
+
+const editingField = ref<EditField | null>(null)
+const editValue = ref('')
+const editError = ref('')
+const editSaving = ref(false)
+
+function startEdit(field: EditField): void {
+  editingField.value = field
+  editValue.value = field === 'name' ? (auth.admin?.name ?? '') : (auth.admin?.phone ?? '')
+  editError.value = ''
+}
+
+function cancelEdit(): void {
+  editingField.value = null
+  editValue.value = ''
+  editError.value = ''
+}
+
+async function saveEdit(): Promise<void> {
+  const field = editingField.value
+  if (!field) return
+
+  const name = field === 'name' ? editValue.value.trim() : (auth.admin?.name ?? '')
+  const phone = field === 'phone' ? editValue.value.trim() : (auth.admin?.phone ?? '')
+  if (field === 'name' && name.length < 2) {
+    editError.value = '姓名至少 2 个字符'
+    return
+  }
+  if (field === 'phone' && phone.length > 20) {
+    editError.value = '手机号最长 20 个字符'
+    return
+  }
+
+  editSaving.value = true
+  try {
+    await auth.updateProfile({ name, phone })
+    toast.success(field === 'name' ? '姓名已更新' : '手机号已更新')
+    cancelEdit()
+  } catch (error) {
+    editError.value = error instanceof ApiError ? error.message : '保存失败，请稍后再试'
+  } finally {
+    editSaving.value = false
+  }
+}
 </script>
 
 <template>
@@ -132,7 +181,7 @@ async function onSubmit(): Promise<void> {
 
     <div v-else-if="loadError" class="card profile__state">
       <div class="card__body flex-center gap10">
-        <UiIcon name="alert-circle" :size="15" />
+        <FaIcon name="exclamation-circle" :size="15" />
         <span class="text-danger text-sm">{{ loadError }}</span>
         <BaseButton size="small" @click="onReload">重新加载</BaseButton>
       </div>
@@ -146,6 +195,7 @@ async function onSubmit(): Promise<void> {
             <span class="profile__avatar">{{ avatarText }}</span>
             <p class="profile__name">{{ auth.admin?.name ?? '加载中...' }}</p>
             <p class="profile__email">{{ auth.admin?.email ?? '-' }}</p>
+            <p v-if="auth.admin?.phone" class="profile__email">{{ auth.admin.phone }}</p>
             <span class="profile__role" :class="{ 'is-super': auth.isSuperAdmin }">{{
               roleText
             }}</span>
@@ -196,27 +246,89 @@ async function onSubmit(): Promise<void> {
               <tbody>
                 <tr>
                   <th class="profile__table-label">姓名</th>
-                  <td>{{ auth.admin?.name ?? '-' }}</td>
+                  <td>
+                    <span v-if="editingField !== 'name'" class="profile__value">
+                      {{ auth.admin?.name ?? '-' }}
+                      <button class="profile__edit" title="编辑姓名" @click="startEdit('name')">
+                        <FaIcon name="edit" :size="13" />
+                      </button>
+                    </span>
+                    <span v-else class="profile__edit-box">
+                      <BaseInput
+                        v-model="editValue"
+                        class="profile__edit-input"
+                        :error="editError"
+                        @keyup.enter="saveEdit"
+                        @keyup.esc="cancelEdit"
+                      />
+                      <button
+                        class="profile__edit-action"
+                        title="保存"
+                        :disabled="editSaving"
+                        @click="saveEdit"
+                      >
+                        <FaIcon name="check" :size="13" />
+                      </button>
+                      <button class="profile__edit-action" title="取消" @click="cancelEdit">
+                        <FaIcon name="times" :size="13" />
+                      </button>
+                    </span>
+                  </td>
                   <th class="profile__table-label">登录邮箱</th>
                   <td>{{ auth.admin?.email ?? '-' }}</td>
                 </tr>
                 <tr>
+                  <th class="profile__table-label">手机号</th>
+                  <td>
+                    <span v-if="editingField !== 'phone'" class="profile__value">
+                      <span v-if="auth.admin?.phone">{{ auth.admin.phone }}</span>
+                      <span v-else class="text-placeholder">未填写</span>
+                      <button class="profile__edit" title="编辑手机号" @click="startEdit('phone')">
+                        <FaIcon name="edit" :size="13" />
+                      </button>
+                    </span>
+                    <span v-else class="profile__edit-box">
+                      <BaseInput
+                        v-model="editValue"
+                        class="profile__edit-input"
+                        placeholder="请输入手机号"
+                        :error="editError"
+                        @keyup.enter="saveEdit"
+                        @keyup.esc="cancelEdit"
+                      />
+                      <button
+                        class="profile__edit-action"
+                        title="保存"
+                        :disabled="editSaving"
+                        @click="saveEdit"
+                      >
+                        <FaIcon name="check" :size="13" />
+                      </button>
+                      <button class="profile__edit-action" title="取消" @click="cancelEdit">
+                        <FaIcon name="times" :size="13" />
+                      </button>
+                    </span>
+                  </td>
                   <th class="profile__table-label">角色</th>
                   <td>{{ roleText }}</td>
+                </tr>
+                <tr>
                   <th class="profile__table-label">账号状态</th>
                   <td>{{ statusText }}</td>
-                </tr>
-                <tr>
                   <th class="profile__table-label">账号 ID</th>
                   <td>{{ auth.admin?.id ?? '-' }}</td>
-                  <th class="profile__table-label">创建时间</th>
-                  <td>{{ formatDateTime(auth.admin?.created_at) }}</td>
                 </tr>
                 <tr>
+                  <th class="profile__table-label">创建时间</th>
+                  <td>{{ formatDateTime(auth.admin?.created_at) }}</td>
                   <th class="profile__table-label">最近登录时间</th>
                   <td>{{ formatDateTime(auth.admin?.last_login_at) }}</td>
+                </tr>
+                <tr>
                   <th class="profile__table-label">最近登录 IP</th>
                   <td>{{ auth.admin?.last_login_ip ?? '-' }}</td>
+                  <th class="profile__table-label"></th>
+                  <td></td>
                 </tr>
               </tbody>
             </table>
@@ -227,7 +339,7 @@ async function onSubmit(): Promise<void> {
           <div class="card__header"><span>安全设置</span></div>
           <div class="card__body">
             <p class="profile__tip">
-              <UiIcon name="alert-circle" :size="14" />
+              <FaIcon name="exclamation-circle" :size="14" />
               修改密码需要邮箱验证码与当前密码，修改成功后当前账号的全部登录会话都会失效，需要重新登录。
             </p>
 
@@ -431,6 +543,74 @@ async function onSubmit(): Promise<void> {
   color: var(--color-text-secondary);
   background-color: transparent;
   border-bottom: 1px solid var(--color-border-lighter);
+}
+
+.profile__phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* 行内编辑铅笔图标 */
+.profile__value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile__edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-placeholder);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    color var(--transition),
+    background-color var(--transition);
+}
+
+.profile__edit:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+/* 行内编辑：输入框 + 保存 / 取消 */
+.profile__edit-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile__edit-input {
+  width: 180px;
+}
+
+.profile__edit-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    color var(--transition),
+    background-color var(--transition);
+}
+
+.profile__edit-action:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+.profile__edit-action[disabled] {
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+  background-color: transparent;
 }
 
 .profile__tip {

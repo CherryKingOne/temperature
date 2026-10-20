@@ -278,6 +278,31 @@ async def test_logout_without_authorization_header_returns_401(client):
 
 
 # ----------------------------------------------------------------------
+# 个人资料
+# ----------------------------------------------------------------------
+async def test_update_profile_updates_name_and_phone(client, email_code):
+    email = unique_email("profile")
+    await register_admin(client, email_code, email)
+    tokens = (await login_admin(client, email)).json()["data"]
+
+    response = await client.patch(
+        f"{API}/profile",
+        headers={"Authorization": f"Bearer {tokens['access_token']}"},
+        json={"name": "新姓名", "phone": "138 0013 8000"},
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()["data"]
+    assert data["name"] == "新姓名"
+    # 手机号会被规范化：去掉空格与分隔符
+    assert data["phone"] == "13800138000"
+
+    me = await client.get(
+        f"{API}/me", headers={"Authorization": f"Bearer {tokens['access_token']}"}
+    )
+    assert me.json()["data"]["phone"] == "13800138000"
+
+
+# ----------------------------------------------------------------------
 # 密码
 # ----------------------------------------------------------------------
 async def test_change_password_requires_correct_old_password(client, email_code):

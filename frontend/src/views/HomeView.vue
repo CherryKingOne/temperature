@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 
-import UiIcon from '@/components/ui/UiIcon.vue'
+import FaIcon from '@/components/ui/FaIcon.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
@@ -51,21 +51,21 @@ onMounted(async () => {
     <div class="home__cards">
       <div class="card">
         <div class="card__body flex-center flex-col gap10">
-          <UiIcon name="user" :size="26" />
+          <FaIcon name="user" :size="26" />
           <span class="text-sm">管理员管理</span>
           <span class="text-xs text-placeholder">账号列表、角色调整、启用禁用</span>
         </div>
       </div>
       <div class="card">
         <div class="card__body flex-center flex-col gap10">
-          <UiIcon name="cog" :size="26" />
+          <FaIcon name="cog" :size="26" />
           <span class="text-sm">菜单与权限</span>
           <span class="text-xs text-placeholder">菜单树、角色权限、字段权限</span>
         </div>
       </div>
       <div class="card">
         <div class="card__body flex-center flex-col gap10">
-          <UiIcon name="bar-chart" :size="26" />
+          <FaIcon name="bar-chart" :size="26" />
           <span class="text-sm">系统监控</span>
           <span class="text-xs text-placeholder">在线用户、操作日志、服务状态</span>
         </div>

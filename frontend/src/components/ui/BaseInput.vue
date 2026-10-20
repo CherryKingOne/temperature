@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import UiIcon from './UiIcon.vue'
+import FaIcon from './FaIcon.vue'
 
 /** 输入框：高度 34px，边框 1px #ddd，圆角 4px，聚焦时高亮 */
 const props = withDefaults(
@@ -53,7 +53,7 @@ function onInput(event: Event): void {
 <template>
   <div class="input-group">
     <span v-if="props.icon" class="input-group__prefix">
-      <UiIcon :name="props.icon" :size="16" />
+      <FaIcon :name="props.icon" :size="16" />
     </span>
     <input
       :id="props.id"
@@ -73,7 +73,7 @@ function onInput(event: Event): void {
       role="button"
       @click="visible = !visible"
     >
-      <UiIcon :name="visible ? 'eye-off' : 'eye'" :size="16" />
+      <FaIcon :name="visible ? 'eye-slash' : 'eye'" :size="16" />
     </span>
   </div>
 </template>

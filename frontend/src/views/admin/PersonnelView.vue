@@ -17,7 +17,7 @@ import BaseModal from '@/components/ui/BaseModal.vue'
 import BasePagination from '@/components/ui/BasePagination.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
 import BaseTag from '@/components/ui/BaseTag.vue'
-import UiIcon from '@/components/ui/UiIcon.vue'
+import FaIcon from '@/components/ui/FaIcon.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import {
@@ -151,6 +151,7 @@ const form = reactive({
   id: '',
   name: '',
   email: '',
+  phone: '',
   employment_type: 'FULL_TIME',
   role: 'MEMBER',
   status: 'ACTIVE',
@@ -163,6 +164,7 @@ function openCreate(): void {
     id: '',
     name: '',
     email: '',
+    phone: '',
     employment_type: 'FULL_TIME',
     role: 'MEMBER',
     status: 'ACTIVE',
@@ -177,6 +179,7 @@ function openEdit(item: Personnel): void {
     id: item.id,
     name: item.name,
     email: item.email,
+    phone: item.phone ?? '',
     employment_type: item.employment_type,
     role: item.role,
     status: item.status,
@@ -201,6 +204,7 @@ async function onSubmit(): Promise<void> {
       await createPersonnel({
         name: form.name.trim(),
         email: form.email.trim(),
+        phone: form.phone.trim(),
         role: form.role as AdminRole,
         employment_type: form.employment_type as EmploymentType,
         status: form.status as PersonnelStatus,
@@ -211,6 +215,7 @@ async function onSubmit(): Promise<void> {
       await updatePersonnel(form.id, {
         name: form.name.trim(),
         email: form.email.trim(),
+        phone: form.phone.trim(),
         role: form.role as AdminRole,
         employment_type: form.employment_type as EmploymentType,
         status: form.status as PersonnelStatus,
@@ -305,12 +310,12 @@ async function onSavePermission(): Promise<void> {
       <div class="card__header">
         <span>人员列表</span>
         <div class="flex gap10">
-          <BaseButton size="small" @click="onRefresh">
-            <template #icon><UiIcon name="arrow-right" :size="14" /></template>
+          <BaseButton size="small" title="刷新列表" @click="onRefresh">
+            <template #icon><FaIcon name="refresh" :size="14" /></template>
             刷新
           </BaseButton>
           <BaseButton v-if="isSuperAdmin" type="primary" size="small" @click="openCreate">
-            <template #icon><UiIcon name="check" :size="14" /></template>
+            <template #icon><FaIcon name="plus" :size="14" /></template>
             新增人员
           </BaseButton>
         </div>
@@ -355,6 +360,7 @@ async function onSavePermission(): Promise<void> {
           <tr>
             <th>姓名</th>
             <th>登录邮箱</th>
+            <th>手机号</th>
             <th>角色</th>
             <th>人员类型</th>
             <th>状态</th>
@@ -375,6 +381,10 @@ async function onSavePermission(): Promise<void> {
               </div>
             </td>
             <td>{{ item.email }}</td>
+            <td>
+              <span v-if="item.phone">{{ item.phone }}</span>
+              <span v-else class="text-placeholder">未填写</span>
+            </td>
             <td>
               <BaseTag
                 :type="
@@ -413,25 +423,37 @@ async function onSavePermission(): Promise<void> {
             <td>{{ formatDateTime(item.created_at) }}</td>
             <td>
               <div class="table__actions personnel__actions">
-                <button class="personnel__action" @click="openEdit(item)">编辑</button>
-                <button class="personnel__action" @click="onToggleStatus(item)">
-                  {{ item.status === 'ACTIVE' ? '禁用' : '启用' }}
+                <button class="personnel__action" title="编辑" @click="openEdit(item)">
+                  <FaIcon name="edit" :size="14" />
                 </button>
-                <button v-if="isSuperAdmin" class="personnel__action" @click="openPermission(item)">
-                  分配权限
+                <button
+                  class="personnel__action"
+                  :title="item.status === 'ACTIVE' ? '禁用' : '启用'"
+                  @click="onToggleStatus(item)"
+                >
+                  <FaIcon name="power-off" :size="14" />
+                </button>
+                <button
+                  v-if="isSuperAdmin"
+                  class="personnel__action"
+                  title="分配权限"
+                  @click="openPermission(item)"
+                >
+                  <FaIcon name="key" :size="14" />
                 </button>
                 <button
                   v-if="isSuperAdmin"
                   class="personnel__action personnel__action--danger"
+                  title="删除"
                   @click="onRemove(item)"
                 >
-                  删除
+                  <FaIcon name="trash-o" :size="14" />
                 </button>
               </div>
             </td>
           </tr>
           <tr v-if="!loading && list.length === 0">
-            <td colspan="8" class="personnel__empty">暂无数据</td>
+            <td colspan="9" class="personnel__empty">暂无数据</td>
           </tr>
         </tbody>
       </table>
@@ -459,6 +481,15 @@ async function onSavePermission(): Promise<void> {
               type="email"
               icon="mail"
               placeholder="请输入邮箱"
+            />
+          </div>
+          <div class="form-item">
+            <label class="form-item__label" for="p-phone">手机号</label>
+            <BaseInput
+              id="p-phone"
+              v-model="form.phone"
+              icon="user"
+              placeholder="用于日常联系，可留空"
             />
           </div>
         </div>
@@ -632,14 +663,23 @@ async function onSavePermission(): Promise<void> {
 }
 
 .personnel__action {
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
   font-size: 13px;
   color: var(--color-primary);
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  transition:
+    color var(--transition),
+    background-color var(--transition);
 }
 
 .personnel__action:hover {
   color: var(--color-primary-active);
+  background-color: var(--color-primary-light);
 }
 
 .personnel__action--danger {

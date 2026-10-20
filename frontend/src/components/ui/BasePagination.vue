@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import UiIcon from './UiIcon.vue'
+import FaIcon from './FaIcon.vue'
 
 /** 分页：居中对齐，每页条数可选 */
 const props = withDefaults(
@@ -61,7 +61,7 @@ function onPageSizeChange(event: Event): void {
       title="上一页"
       @click="go(props.modelValue - 1)"
     >
-      <UiIcon name="chevron-down" :size="12" class="pagination__prev" />
+      <FaIcon name="chevron-down" :size="12" class="pagination__prev" />
     </button>
 
     <template v-for="(page, index) in pages" :key="`${page}-${index}`">
@@ -82,7 +82,7 @@ function onPageSizeChange(event: Event): void {
       title="下一页"
       @click="go(props.modelValue + 1)"
     >
-      <UiIcon name="chevron-down" :size="12" class="pagination__next" />
+      <FaIcon name="chevron-down" :size="12" class="pagination__next" />
     </button>
 
     <select class="pagination__size" :value="props.pageSize" @change="onPageSizeChange">

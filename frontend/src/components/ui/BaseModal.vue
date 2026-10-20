@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UiIcon from './UiIcon.vue'
+import FaIcon from './FaIcon.vue'
 
 /** 弹窗：遮罩 rgba(0,0,0,.5)，内容圆角 8px 居中 */
 const props = withDefaults(
@@ -29,7 +29,7 @@ function close(): void {
         <div class="modal__header">
           <span>{{ props.title }}</span>
           <span class="modal__close" title="关闭" @click="close">
-            <UiIcon name="close" :size="16" />
+            <FaIcon name="times" :size="16" />
           </span>
         </div>
         <div class="modal__body">

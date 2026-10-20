@@ -10,7 +10,8 @@ Temperature 平台管理端前端。Vue 3 + TypeScript + Vite + Pinia + Vue Rout
 | 构建 | Vite 8 |
 | 状态管理 | Pinia |
 | 路由 | Vue Router 4 |
-| 样式 | 原生 CSS + CSS 变量（无 UI 框架、无图标库依赖） |
+| 样式 | 原生 CSS + CSS 变量（无 UI 框架依赖） |
+| 图标 | Font Awesome 4.7（CDN 引入，与若依一致） |
 
 ## 目录结构
 
@@ -85,7 +86,7 @@ VITE_PROXY_TARGET=http://127.0.0.1:8001 bun dev
 - `BaseButton`：圆角 3px，高 34px（标准）/ 28px（小），支持 primary / success / warning / danger / info、rounded、outline、block、loading。
 - `BaseInput`：高 34px，边框 `#ddd`，聚焦高亮，支持前置图标与密码明文切换。
 - `BaseCheckbox`：18x18px 选中态为主题色。
-- `UiIcon`：内置线性图标，不依赖外部图标库。
+- `FaIcon`：Font Awesome 4.7 图标（与若依一致），在 `index.html` 引入 CDN。
 - `ToastHost`：顶部提示，3 秒自动关闭。
 
 ### 页面

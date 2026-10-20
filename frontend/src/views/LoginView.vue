@@ -7,7 +7,7 @@ import AuthLayout from '@/components/auth/AuthLayout.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
-import UiIcon from '@/components/ui/UiIcon.vue'
+import FaIcon from '@/components/ui/FaIcon.vue'
 import { DEFAULT_HOME } from '@/router'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
@@ -82,7 +82,7 @@ async function onSubmit(): Promise<void> {
   <AuthLayout title="账号登录" subtitle="请使用管理员邮箱登录管理后台">
     <form class="form" novalidate @submit.prevent="onSubmit">
       <div v-if="errorMessage" class="auth__error">
-        <UiIcon name="alert-circle" :size="15" />
+        <FaIcon name="exclamation-circle" :size="15" />
         <span>{{ errorMessage }}</span>
       </div>
 

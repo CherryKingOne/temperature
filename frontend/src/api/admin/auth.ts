@@ -6,6 +6,7 @@ import type {
   LoginResult,
   RegisterPayload,
   SendEmailCodeResult,
+  UpdateProfilePayload,
 } from '@/types/api'
 
 const BASE = '/admin/auth'
@@ -32,6 +33,11 @@ export function register(payload: RegisterPayload) {
 /** 获取当前管理员信息 */
 export function fetchCurrentAdmin() {
   return http.get<AdminUser>(`${BASE}/me`)
+}
+
+/** 修改自身资料（姓名、手机号） */
+export function updateProfile(payload: UpdateProfilePayload) {
+  return http.patch<AdminUser>(`${BASE}/profile`, payload)
 }
 
 /** 修改自身密码（需邮箱验证码 + 原密码） */

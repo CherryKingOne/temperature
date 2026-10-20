@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UiIcon from '@/components/ui/UiIcon.vue'
+import FaIcon from '@/components/ui/FaIcon.vue'
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher.vue'
 
 /** 认证页布局：左侧系统介绍 + 右侧表单，宽度 750px */
@@ -16,7 +16,7 @@ withDefaults(defineProps<{ title: string; subtitle?: string }>(), {
       <div class="auth__panel">
         <aside class="auth__intro">
           <div class="auth__brand">
-            <span class="auth__brand-logo"><UiIcon name="bar-chart" :size="18" /></span>
+            <span class="auth__brand-logo"><FaIcon name="bar-chart" :size="18" /></span>
             <span>Temperature 平台</span>
           </div>
           <h1 class="auth__intro-title">企业级后台管理系统</h1>
@@ -25,15 +25,15 @@ withDefaults(defineProps<{ title: string; subtitle?: string }>(), {
           </p>
           <ul class="auth__features">
             <li class="auth__feature">
-              <UiIcon class="auth__feature-icon" name="check-circle" :size="15" />
+              <FaIcon class="auth__feature-icon" name="check-circle" :size="15" />
               统一身份认证，支持邮箱验证码校验
             </li>
             <li class="auth__feature">
-              <UiIcon class="auth__feature-icon" name="check-circle" :size="15" />
+              <FaIcon class="auth__feature-icon" name="check-circle" :size="15" />
               细粒度的角色与菜单权限体系
             </li>
             <li class="auth__feature">
-              <UiIcon class="auth__feature-icon" name="check-circle" :size="15" />
+              <FaIcon class="auth__feature-icon" name="check-circle" :size="15" />
               多主题切换，适配不同团队视觉规范
             </li>
           </ul>

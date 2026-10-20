@@ -14,6 +14,8 @@ export interface Personnel {
   id: string
   name: string
   email: string
+  /** 手机号（联系方式） */
+  phone: string | null
   role: AdminRole
   employment_type: EmploymentType
   status: PersonnelStatus
@@ -45,6 +47,7 @@ export interface PageResult<T> {
 export interface PersonnelPayload {
   name: string
   email: string
+  phone?: string
   role: AdminRole
   employment_type: EmploymentType
   status: PersonnelStatus

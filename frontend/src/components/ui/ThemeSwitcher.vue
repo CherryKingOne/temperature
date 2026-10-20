@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { THEME_COLORS, useThemeStore } from '@/stores/theme'
-import UiIcon from './UiIcon.vue'
+import FaIcon from './FaIcon.vue'
 
 /**
  * 主题切换器：切换主题色与明暗模式
@@ -34,7 +34,7 @@ const theme = useThemeStore()
       role="button"
       @click="theme.toggleMode()"
     >
-      <UiIcon :name="theme.mode === 'light' ? 'moon' : 'sun'" :size="15" />
+      <FaIcon :name="theme.mode === 'light' ? 'moon-o' : 'sun-o'" :size="15" />
     </span>
   </div>
 </template>

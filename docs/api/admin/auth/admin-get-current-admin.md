@@ -30,6 +30,7 @@
     "id": "370893497273683968",
     "name": "张伟",
     "email": "admin@example.com",
+    "phone": "13800138000",
     "role": "SUPER_ADMIN",
     "is_super_admin": true,
     "status": "ACTIVE",
@@ -49,6 +50,7 @@
 | `id` | string | 管理员 ID（雪花 ID，以字符串返回避免前端精度丢失） |
 | `name` | string | 姓名 |
 | `email` | string | 邮箱 |
+| `phone` | string \| null | 手机号（联系方式） |
 | `role` | string | 角色：`SUPER_ADMIN` / `ADMIN` |
 | `is_super_admin` | bool | 是否为超级管理员，等价于 `role == "SUPER_ADMIN"` |
 | `status` | string | 账号状态：`ACTIVE` / `DISABLED` |
