@@ -46,3 +46,14 @@ bun run build
 ```sh
 bun lint
 ```
+
+# 开发版本
+cd frontend
+bun install
+bun dev
+
+
+# 生成版本的指令：
+cd frontend
+bun run build      # 生成 dist/（压缩、优化后的生产包）
+bun run preview    # 本地起一个服务器，模拟线上环境访问 dist/
