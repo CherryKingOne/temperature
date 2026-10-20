@@ -11,7 +11,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: temperature
       MYSQL_USER: temperature
-      MYSQL_PASSWORD: temperature
+      MYSQL_PASSWORD: temperature123
     ports:
       - "3306:3306"
     # 数据落在仓库 backend/data 下；相对路径，仓库放任何服务器都无需改动
@@ -27,13 +27,14 @@ services:
     image: redis:7-alpine
     container_name: temperature-redis
     restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
+    # 与 MySQL 业务账号使用同一个密码
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "temperature123"]
     ports:
       - "6379:6379"
     volumes:
       - ./backend/data/redis:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "temperature123", "ping"]
       interval: 10s
       timeout: 5s
       retries: 10
