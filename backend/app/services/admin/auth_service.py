@@ -237,6 +237,11 @@ class AuthService:
         if verify_password(payload.password, admin.password_hash):
             raise BusinessError("新密码不能与原密码相同")
 
+        # 邮箱验证码校验：与重置密码同一场景，校验通过后立即失效
+        await self._verification.verify_code(
+            admin.email, EmailCodeScene.RESET_PASSWORD, payload.code
+        )
+
         admin.password_hash = hash_password(payload.password)
         await self._session.commit()
         await self._revoke_all_sessions(admin.id)

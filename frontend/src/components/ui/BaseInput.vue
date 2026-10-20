@@ -66,7 +66,13 @@ function onInput(event: Event): void {
       :autocomplete="props.autocomplete"
       @input="onInput"
     />
-    <span v-if="props.passwordToggle" class="input-group__suffix" @click="visible = !visible">
+    <span
+      v-if="props.passwordToggle"
+      class="input-group__suffix"
+      :title="visible ? '隐藏密码' : '显示密码'"
+      role="button"
+      @click="visible = !visible"
+    >
       <UiIcon :name="visible ? 'eye-off' : 'eye'" :size="16" />
     </span>
   </div>

@@ -26,6 +26,7 @@ const ICONS: Record<string, string> = {
   'bar-chart':
     '<path d="M3 21h18"/><rect x="5" y="11" width="4" height="7"/><rect x="11" y="6" width="4" height="12"/><rect x="17" y="9" width="4" height="9"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  'chevron-down': '<path d="m6 9 6 6 6-6"/>',
 }
 
 const props = withDefaults(defineProps<{ name: string; size?: number }>(), {

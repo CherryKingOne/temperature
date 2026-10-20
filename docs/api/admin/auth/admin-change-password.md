@@ -21,6 +21,7 @@ Body（JSON）：
 
 | 字段 | 类型 | 必填 | 约束 | 说明 |
 | --- | --- | --- | --- | --- |
+| `code` | string | 是 | 6 位纯数字 | 邮箱验证码，需与 `scene=reset_password` 的验证码匹配 |
 | `old_password` | string | 是 | 1–72 字节 | 当前密码 |
 | `password` | string | 是 | 8–72 字节 | 新密码 |
 | `password_confirm` | string | 是 | 8–72 字节 | 确认新密码，必须与 `password` 一致 |
@@ -29,6 +30,7 @@ Body（JSON）：
 
 ```json
 {
+  "code": "123456",
   "old_password": "Abcd@1234",
   "password": "Wxyz@5678",
   "password_confirm": "Wxyz@5678"
@@ -64,18 +66,19 @@ Body（JSON）：
 1. 必须校验 `old_password` 与库中 bcrypt 哈希匹配，不匹配返回 `42200`。
 2. `password` 与 `password_confirm` 不一致返回 `40001`。
 3. 新密码不得与原密码相同，返回 `42200`。
-4. 新密码使用 bcrypt（cost=12）重新哈希后覆盖写入。
-5. 密码修改成功后，**吊销该管理员的全部刷新会话**（清除 Redis 中该管理员的所有 `admin:auth:refresh:*` 会话键），强制重新登录。
-6. 接口需要携带有效的访问令牌，因此新密码不含「忘记密码」流程中的验证码校验。
+4. 必须同时提供邮箱验证码：先调用 `POST /api/admin/auth/send-email-code`（`scene=reset_password`）获取，验证码为 6 位纯数字，校验通过后立即失效；错误或过期返回 `42200`。
+5. 新密码使用 bcrypt（cost=12）重新哈希后覆盖写入。
+6. 密码修改成功后，**吊销该管理员的全部刷新会话**（清除 Redis 中该管理员的所有 `admin:auth:refresh:*` 会话键），强制重新登录。
+7. 接口需要携带有效的访问令牌，因此新密码不含「忘记密码」流程中的验证码校验。
 
 ## 错误码
 
 | code | HTTP | 说明 |
 | --- | --- | --- |
 | `0` | 200 | 修改成功 |
-| `40001` | 422 | 参数校验失败（两次新密码不一致、密码长度非法） |
+| `40001` | 422 | 参数校验失败（两次新密码不一致、密码长度非法、验证码非纯数字） |
 | `40100` | 401 | 未登录或访问令牌无效 |
-| `42200` | 422 | 原密码不正确，或新密码与原密码相同 |
+| `42200` | 422 | 原密码不正确，或新密码与原密码相同，或验证码错误/已过期 |
 
 ## 调用示例
 
@@ -83,5 +86,10 @@ Body（JSON）：
 curl -X POST 'http://127.0.0.1:8000/api/admin/auth/change-password' \
   -H 'Authorization: Bearer <access_token>' \
   -H 'Content-Type: application/json' \
-  -d '{"old_password":"Abcd@1234","password":"Wxyz@5678","password_confirm":"Wxyz@5678"}'
+  -d '{
+    "code": "123456",
+    "old_password": "Abcd@1234",
+    "password": "Wxyz@5678",
+    "password_confirm": "Wxyz@5678"
+  }'
 ```

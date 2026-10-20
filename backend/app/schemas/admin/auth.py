@@ -105,11 +105,20 @@ class RefreshTokenRequest(BaseModel):
 class ChangePasswordRequest(BaseModel):
     """修改自身密码。"""
 
+    code: str = Field(description="邮箱验证码（纯数字，scene=reset_password）")
     old_password: str = Field(min_length=1)
     password: str = Field(min_length=8)
     password_confirm: str = Field(min_length=8)
 
-    @field_validator("password", "password_confirm")
+    @field_validator("code")
+    @classmethod
+    def _digits_only(cls, value: str) -> str:
+        value = value.strip()
+        if not value.isdigit():
+            raise ValueError("验证码必须为纯数字")
+        return value
+
+    @field_validator("old_password", "password", "password_confirm")
     @classmethod
     def _check_password_length(cls, value: str) -> str:
         return _validate_password_bytes(value)

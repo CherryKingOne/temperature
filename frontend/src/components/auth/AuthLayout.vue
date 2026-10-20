@@ -49,7 +49,7 @@ withDefaults(defineProps<{ title: string; subtitle?: string }>(), {
 
     <footer class="auth__footer">
       <span>Copyright © 2026 Temperature Platform</span>
-      <ThemeSwitcher variant="inline" />
+      <ThemeSwitcher />
     </footer>
   </div>
 </template>

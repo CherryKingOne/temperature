@@ -8,6 +8,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import UiIcon from '@/components/ui/UiIcon.vue'
+import { DEFAULT_HOME } from '@/router'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 
@@ -66,7 +67,9 @@ async function onSubmit(): Promise<void> {
       localStorage.removeItem(REMEMBER_KEY)
     }
     toast.success(`欢迎回来，${admin.name}`)
-    await router.push('/')
+    // 登录后默认进入个人中心：该页面对所有账号开放，不受权限影响
+    const redirect = route.query.redirect
+    await router.push(typeof redirect === 'string' && redirect ? redirect : DEFAULT_HOME)
   } catch (error) {
     errorMessage.value = error instanceof ApiError ? error.message : '登录失败，请稍后再试'
   } finally {

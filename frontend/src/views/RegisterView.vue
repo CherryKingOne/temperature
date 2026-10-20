@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { ApiError } from '@/api/client'
@@ -8,6 +8,7 @@ import AuthLayout from '@/components/auth/AuthLayout.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import UiIcon from '@/components/ui/UiIcon.vue'
+import { useCountdown } from '@/composables/useCountdown'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 
@@ -28,8 +29,7 @@ const errorMessage = ref('')
 const submitting = ref(false)
 const sending = ref(false)
 /** 验证码重发倒计时（秒），0 表示可重新发送 */
-const countdown = ref(0)
-let timer: number | undefined
+const { remaining: countdown, start: startCountdown } = useCountdown(CODE_COUNTDOWN_SECONDS)
 
 const passwordStrength = computed(() => {
   const value = password.value
@@ -41,10 +41,6 @@ const passwordStrength = computed(() => {
   if (score <= 1) return { level: 1, text: '弱', color: 'var(--color-danger)' }
   if (score === 2) return { level: 2, text: '中', color: 'var(--color-warning)' }
   return { level: 3, text: '强', color: 'var(--color-success)' }
-})
-
-onBeforeUnmount(() => {
-  if (timer) window.clearInterval(timer)
 })
 
 function validate(): boolean {
@@ -70,18 +66,6 @@ function validate(): boolean {
   }
   errors.value = next
   return Object.keys(next).length === 0
-}
-
-function startCountdown(): void {
-  countdown.value = CODE_COUNTDOWN_SECONDS
-  if (timer) window.clearInterval(timer)
-  timer = window.setInterval(() => {
-    countdown.value -= 1
-    if (countdown.value <= 0) {
-      window.clearInterval(timer)
-      timer = undefined
-    }
-  }, 1000)
 }
 
 /** 发送邮箱验证码：倒计时由前端负责，服务端不做重发冷却 */

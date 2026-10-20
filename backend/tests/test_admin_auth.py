@@ -284,11 +284,14 @@ async def test_change_password_requires_correct_old_password(client, email_code)
     email = unique_email("chpwd")
     await register_admin(client, email_code, email)
     tokens = (await login_admin(client, email)).json()["data"]
+    await request_code(client, email, scene="reset_password")
+    code = await email_code(email, scene="reset_password")
 
     response = await client.post(
         f"{API}/change-password",
         headers={"Authorization": f"Bearer {tokens['access_token']}"},
         json={
+            "code": code,
             "old_password": "Wrong@1234",
             "password": "Wxyz@5678",
             "password_confirm": "Wxyz@5678",
@@ -298,15 +301,42 @@ async def test_change_password_requires_correct_old_password(client, email_code)
     assert response.json()["code"] == 42200
 
 
-async def test_change_password_then_login_with_new_password(client, email_code):
-    email = unique_email("chpwd2")
+async def test_change_password_requires_valid_email_code(client, email_code):
+    """修改密码必须校验邮箱验证码。"""
+    email = unique_email("chpwd-code")
     await register_admin(client, email_code, email)
     tokens = (await login_admin(client, email)).json()["data"]
+    await request_code(client, email, scene="reset_password")
 
     response = await client.post(
         f"{API}/change-password",
         headers={"Authorization": f"Bearer {tokens['access_token']}"},
         json={
+            "code": "000000",
+            "old_password": "Abcd@1234",
+            "password": "Wxyz@5678",
+            "password_confirm": "Wxyz@5678",
+        },
+    )
+    assert response.status_code == 422
+    assert response.json()["code"] == 42200
+
+    # 验证码错误时密码不应被修改
+    assert (await login_admin(client, email, password="Abcd@1234")).status_code == 200
+
+
+async def test_change_password_then_login_with_new_password(client, email_code):
+    email = unique_email("chpwd2")
+    await register_admin(client, email_code, email)
+    tokens = (await login_admin(client, email)).json()["data"]
+    await request_code(client, email, scene="reset_password")
+    code = await email_code(email, scene="reset_password")
+
+    response = await client.post(
+        f"{API}/change-password",
+        headers={"Authorization": f"Bearer {tokens['access_token']}"},
+        json={
+            "code": code,
             "old_password": "Abcd@1234",
             "password": "Wxyz@5678",
             "password_confirm": "Wxyz@5678",

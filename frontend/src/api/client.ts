@@ -5,6 +5,9 @@ export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '/api'
 
 const TOKEN_KEY = 'temperature_access_token'
 
+/** 令牌失效事件：接口返回 401 时广播，由路由统一跳转登录页 */
+export const AUTH_EXPIRED_EVENT = 'auth:expired'
+
 /** 业务异常：携带后端业务状态码 */
 export class ApiError extends Error {
   readonly code: number
@@ -71,6 +74,11 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   if (!response.ok || !payload || payload.code !== 0) {
     const code = payload?.code ?? response.status * 100
     const message = payload?.message ?? `请求失败（HTTP ${response.status}）`
+    if (response.status === 401 && auth) {
+      // 令牌无效或已被吊销：清除本地令牌并通知上层跳转登录
+      setToken(null)
+      window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT))
+    }
     throw new ApiError(code, message, response.status, payload?.request_id ?? null)
   }
 

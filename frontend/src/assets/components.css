@@ -228,32 +228,43 @@
   align-items: center;
 }
 
-.input-group__prefix,
-.input-group__suffix {
+.input-group__prefix {
   position: absolute;
+  left: 12px;
   display: inline-flex;
   align-items: center;
   color: var(--color-text-placeholder);
   pointer-events: none;
 }
 
-.input-group__prefix {
-  left: 12px;
-}
-
 .input-group__suffix {
-  right: 12px;
+  position: absolute;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
   pointer-events: auto;
   cursor: pointer;
+  transition:
+    color var(--transition),
+    background-color var(--transition);
+}
+
+.input-group__suffix:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
 }
 
 .input-group__prefix ~ .input {
   padding-left: 36px;
 }
 
-.input-group__suffix ~ .input,
 .input--has-suffix {
-  padding-right: 36px;
+  padding-right: 38px;
 }
 
 /* ------------------------------------------------------------------
@@ -836,20 +847,12 @@
 
 /* ------------------------------------------------------------------
  * 主题切换器
+ * 轻量内联样式：用于后台顶栏与认证页底部，不加浮层背景，避免遮挡内容
  * ------------------------------------------------------------------ */
 .theme-switcher {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 100;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 10px;
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: var(--radius);
-  backdrop-filter: blur(6px);
 }
 
 .theme-switcher__swatches {
@@ -859,76 +862,61 @@
 }
 
 .theme-switcher__swatch {
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
+  width: 12px;
+  height: 12px;
+  opacity: 0.75;
+  border: 1px solid transparent;
   border-radius: 50%;
   cursor: pointer;
-  transition: transform var(--transition);
+  transition:
+    transform var(--transition),
+    opacity var(--transition);
 }
 
 .theme-switcher__swatch:hover {
-  transform: scale(1.15);
+  opacity: 1;
+  transform: scale(1.2);
 }
 
 .theme-switcher__swatch.is-active {
-  border-color: #fff;
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
 }
 
 .theme-switcher__action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  font-size: 14px;
-  color: #fff;
+  width: 22px;
+  height: 22px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color var(--transition);
+  transition:
+    color var(--transition),
+    background-color var(--transition);
 }
 
 .theme-switcher__action:hover {
-  background-color: rgba(255, 255, 255, 0.18);
-}
-
-/* 内联样式：认证页底部使用，无浮层背景，避免遮挡内容 */
-.theme-switcher--inline {
-  position: static;
-  gap: 8px;
-  padding: 0;
-  background-color: transparent;
-  border: none;
-  backdrop-filter: none;
-}
-
-.theme-switcher--inline .theme-switcher__swatch {
-  width: 12px;
-  height: 12px;
-  border-width: 1px;
-  opacity: 0.75;
-}
-
-.theme-switcher--inline .theme-switcher__swatch:hover {
-  opacity: 1;
-}
-
-.theme-switcher--inline .theme-switcher__swatch.is-active {
-  border-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
-  opacity: 1;
-}
-
-.theme-switcher--inline .theme-switcher__action {
-  width: 20px;
-  height: 20px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.theme-switcher--inline .theme-switcher__action:hover {
   color: #fff;
   background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 浅色卡片上使用（账号菜单） */
+.theme-switcher--light .theme-switcher__action {
+  color: var(--color-text-secondary);
+}
+
+.theme-switcher--light .theme-switcher__action:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+.theme-switcher--light .theme-switcher__swatch.is-active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
 }
 
 /* ------------------------------------------------------------------

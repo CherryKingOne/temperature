@@ -1,32 +1,42 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 import UiIcon from '@/components/ui/UiIcon.vue'
-import ThemeSwitcher from '@/components/ui/ThemeSwitcher.vue'
+import UserMenu from '@/components/ui/UserMenu.vue'
 import { useAuthStore } from '@/stores/auth'
-import { useToastStore } from '@/stores/toast'
 
 /** 基本布局：顶部导航 + 侧边栏 + 内容区（页签） */
 const auth = useAuthStore()
-const toast = useToastStore()
-const router = useRouter()
+const route = useRoute()
 
 const collapsed = ref(false)
 
-const MENU = [
-  { key: 'home', title: '首页', icon: 'home' },
+interface MenuItem {
+  key: string
+  title: string
+  icon: string
+  /** 已实现的页面跳转地址；为空表示功能开发中 */
+  path?: string
+}
+
+const MENU: MenuItem[] = [
+  { key: 'profile', title: '个人中心', icon: 'user', path: '/profile' },
+  { key: 'home', title: '首页', icon: 'home', path: '/home' },
   { key: 'admin', title: '管理员管理', icon: 'user' },
   { key: 'system', title: '系统设置', icon: 'cog' },
 ]
 
-const activeMenu = ref('home')
+const activeKey = computed(() => route.path.replace(/^\//, '').split('/')[0] ?? '')
 
-async function onLogout(): Promise<void> {
-  await auth.logout()
-  toast.success('已安全退出')
-  await router.push('/login')
-}
+const currentTitle = computed(() => (route.meta.title as string | undefined) ?? '个人中心')
+
+onMounted(async () => {
+  // 刷新页面后恢复登录态：顶栏头像与账号菜单需要管理员信息
+  if (!auth.admin) {
+    await auth.loadCurrentAdmin().catch(() => undefined)
+  }
+})
 </script>
 
 <template>
@@ -41,31 +51,28 @@ async function onLogout(): Promise<void> {
       </div>
 
       <div class="layout__navbar-right">
-        <ThemeSwitcher />
-        <span class="layout__user">
-          <UiIcon name="user" :size="15" />
-          {{ auth.admin?.name ?? '管理员' }}
-          <em v-if="auth.isSuperAdmin" class="layout__role">超级管理员</em>
-        </span>
-        <button class="layout__logout" title="退出登录" @click="onLogout">
-          <UiIcon name="arrow-right" :size="15" />
-        </button>
+        <UserMenu />
       </div>
     </header>
 
     <aside class="layout__sidebar" :class="{ 'is-collapsed': collapsed }">
       <nav class="layout__menu">
-        <div
-          v-for="item in MENU"
-          :key="item.key"
-          class="layout__menu-item"
-          :class="{ 'is-active': activeMenu === item.key }"
-          :title="item.title"
-          @click="activeMenu = item.key"
-        >
-          <UiIcon :name="item.icon" :size="16" />
-          <span class="layout__menu-text">{{ item.title }}</span>
-        </div>
+        <template v-for="item in MENU" :key="item.key">
+          <router-link
+            v-if="item.path"
+            class="layout__menu-item"
+            :class="{ 'is-active': activeKey === item.key }"
+            :to="item.path"
+            :title="item.title"
+          >
+            <UiIcon :name="item.icon" :size="16" />
+            <span class="layout__menu-text">{{ item.title }}</span>
+          </router-link>
+          <div v-else class="layout__menu-item is-disabled" :title="`${item.title}（功能开发中）`">
+            <UiIcon :name="item.icon" :size="16" />
+            <span class="layout__menu-text">{{ item.title }}</span>
+          </div>
+        </template>
       </nav>
     </aside>
 
@@ -73,7 +80,7 @@ async function onLogout(): Promise<void> {
       <div class="tabs">
         <div class="tabs__item is-active">
           <UiIcon name="home" :size="13" />
-          首页
+          {{ currentTitle }}
         </div>
       </div>
       <div class="layout__view">
@@ -134,27 +141,6 @@ async function onLogout(): Promise<void> {
   font-weight: 500;
 }
 
-.layout__user {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-}
-
-.layout__role {
-  padding: 1px 6px;
-  font-size: 11px;
-  font-style: normal;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
-}
-
-.layout__logout {
-  display: inline-flex;
-  color: #fff;
-  cursor: pointer;
-}
-
 .layout__sidebar {
   position: fixed;
   top: var(--navbar-height);
@@ -198,6 +184,17 @@ async function onLogout(): Promise<void> {
   color: var(--sidebar-text-active);
   background-color: var(--sidebar-active-bg);
   box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+.layout__menu-item.is-disabled {
+  color: var(--sidebar-text);
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.layout__menu-item.is-disabled:hover {
+  color: var(--sidebar-text);
+  background-color: transparent;
 }
 
 .layout__menu-text {

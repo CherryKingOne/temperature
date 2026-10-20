@@ -34,6 +34,16 @@ export function fetchCurrentAdmin() {
   return http.get<AdminUser>(`${BASE}/me`)
 }
 
+/** 修改自身密码（需邮箱验证码 + 原密码） */
+export function changePassword(payload: {
+  code: string
+  old_password: string
+  password: string
+  password_confirm: string
+}) {
+  return http.post<null>(`${BASE}/change-password`, payload)
+}
+
 /** 登出 */
 export function logout() {
   return http.post<null>(`${BASE}/logout`)
