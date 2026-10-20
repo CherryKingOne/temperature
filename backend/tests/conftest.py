@@ -26,6 +26,9 @@ os.environ.setdefault("SMTP_HOST", "127.0.0.1")
 os.environ.setdefault("SMTP_PORT", "12525")
 os.environ.setdefault("SMTP_USE_SSL", "false")
 os.environ.setdefault("SMTP_FROM_EMAIL", "noreply@temperature.test")
+# 本地测试 SMTP 服务器不带 AUTH，账号密码一律置空，避免读到 .env 里的真实凭据
+os.environ.setdefault("SMTP_USERNAME", "")
+os.environ.setdefault("SMTP_PASSWORD", "")
 
 import pytest  # noqa: E402
 import pytest_asyncio  # noqa: E402
