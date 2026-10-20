@@ -2,12 +2,20 @@
 import { THEME_COLORS, useThemeStore } from '@/stores/theme'
 import UiIcon from './UiIcon.vue'
 
-/** 主题切换器：切换主题色与明暗模式 */
+/**
+ * 主题切换器：切换主题色与明暗模式
+ * - floating：浮层样式，用于后台顶栏
+ * - inline：轻量内联样式，用于登录/注册页底部，不遮挡内容
+ */
+const props = withDefaults(defineProps<{ variant?: 'floating' | 'inline' }>(), {
+  variant: 'floating',
+})
+
 const theme = useThemeStore()
 </script>
 
 <template>
-  <div class="theme-switcher">
+  <div class="theme-switcher" :class="`theme-switcher--${props.variant}`">
     <div class="theme-switcher__swatches">
       <button
         v-for="item in THEME_COLORS"

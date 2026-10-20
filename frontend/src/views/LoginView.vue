@@ -121,7 +121,7 @@ async function onSubmit(): Promise<void> {
         {{ submitting ? '登录中...' : '登 录' }}
       </BaseButton>
 
-      <p class="auth__footer">登录即表示同意平台服务条款与隐私政策</p>
+      <p class="auth__tip">登录即表示同意平台服务条款与隐私政策</p>
     </form>
   </AuthLayout>
 </template>

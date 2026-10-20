@@ -11,7 +11,6 @@ withDefaults(defineProps<{ title: string; subtitle?: string }>(), {
 <template>
   <div class="auth">
     <div class="auth__background" />
-    <ThemeSwitcher />
 
     <div class="auth__body">
       <div class="auth__panel">
@@ -48,6 +47,9 @@ withDefaults(defineProps<{ title: string; subtitle?: string }>(), {
       </div>
     </div>
 
-    <footer class="auth__footer">Copyright © 2026 Temperature Platform</footer>
+    <footer class="auth__footer">
+      <span>Copyright © 2026 Temperature Platform</span>
+      <ThemeSwitcher variant="inline" />
+    </footer>
   </div>
 </template>

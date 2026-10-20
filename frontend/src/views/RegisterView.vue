@@ -234,7 +234,7 @@ async function onSubmit(): Promise<void> {
         {{ submitting ? '注册中...' : '注 册' }}
       </BaseButton>
 
-      <p class="auth__footer">已有账号？<router-link to="/login">返回登录</router-link></p>
+      <p class="auth__tip">已有账号？<router-link to="/login">返回登录</router-link></p>
     </form>
   </AuthLayout>
 </template>

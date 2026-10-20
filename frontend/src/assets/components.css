@@ -781,10 +781,25 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-.auth__footer {
+.auth__tip {
   margin-top: 18px;
   font-size: 13px;
   color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+}
+
+.auth__tip a {
+  color: #fff;
+}
+
+.auth__footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 12px 20px 18px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
   text-align: center;
 }
 
@@ -875,6 +890,45 @@
 
 .theme-switcher__action:hover {
   background-color: rgba(255, 255, 255, 0.18);
+}
+
+/* 内联样式：认证页底部使用，无浮层背景，避免遮挡内容 */
+.theme-switcher--inline {
+  position: static;
+  gap: 8px;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  backdrop-filter: none;
+}
+
+.theme-switcher--inline .theme-switcher__swatch {
+  width: 12px;
+  height: 12px;
+  border-width: 1px;
+  opacity: 0.75;
+}
+
+.theme-switcher--inline .theme-switcher__swatch:hover {
+  opacity: 1;
+}
+
+.theme-switcher--inline .theme-switcher__swatch.is-active {
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+  opacity: 1;
+}
+
+.theme-switcher--inline .theme-switcher__action {
+  width: 20px;
+  height: 20px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.theme-switcher--inline .theme-switcher__action:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 /* ------------------------------------------------------------------
