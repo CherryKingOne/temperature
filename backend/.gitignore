@@ -1,0 +1,37 @@
+# Python-generated files
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment / 密钥（.env.example 模板可提交）
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+.zed/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+# 本地数据目录（MySQL 数据文件等，路径随仓库位置变化，不入版本库）
+data/*
+!data/.gitkeep

@@ -1,0 +1,41 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Temperature service backend"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncmy>=0.2.9",
+    "cryptography>=43.0.0",
+    "redis>=5.2.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+    "email-validator>=2.2.0",
+    "pyjwt>=2.9.0",
+    "bcrypt>=4.2.0",
+    "aiosmtplib>=3.0.1",
+    "greenlet>=3.1.0",
+]
+
+# 国内镜像，实测比上游 PyPI 快一个数量级；设为 default 后所有依赖默认走这里。
+[[tool.uv.index]]
+url = "https://mirrors.aliyun.com/pypi/simple/"
+default = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.27.0",
+    "asgi-lifespan>=2.1.0",
+    "aiosmtpd>=1.4.6",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["tests"]
