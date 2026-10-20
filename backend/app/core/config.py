@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Annotated
+from typing import Annotated, Literal
 from urllib.parse import quote
 
 from pydantic import Field, field_validator
@@ -14,7 +14,8 @@ class Settings(BaseSettings):
     """应用配置，全部通过环境变量或 .env 文件注入。"""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        # 项目根目录的 .env 为统一配置源；backend/.env 可作为本地覆盖（优先级更高）
+        env_file=("../.env", ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
@@ -43,14 +44,15 @@ class Settings(BaseSettings):
 
     # ---- 邮箱验证码 ----
     email_code_expire_seconds: int = 300
-    email_code_resend_seconds: int = 60
     email_code_max_attempts: int = 5
 
     # ---- 登录失败锁定 ----
     login_max_failures: int = 5
     login_lock_seconds: int = 900
 
-    # ---- SMTP ----
+    # ---- 邮件 ----
+    # smtp：经真实 SMTP 服务器发送；console：验证码只打印到服务输出（本地开发用，免邮件容器）
+    email_backend: Literal["smtp", "console"] = "smtp"
     smtp_host: str = ""
     smtp_port: int = 465
     smtp_username: str = ""

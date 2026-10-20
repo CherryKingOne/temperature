@@ -39,6 +39,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     set_redis_client(redis)
     async with engine.begin() as conn:
         await init_schema(conn)
+    if settings.email_backend == "console":
+        logger.warning(
+            "邮件后端为 console：验证码只打印到服务输出，不会真实发送；"
+            "生产环境请配置 EMAIL_BACKEND=smtp 与真实 SMTP 账号"
+        )
     logger.info("应用启动完成")
     try:
         yield

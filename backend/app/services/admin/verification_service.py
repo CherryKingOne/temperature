@@ -16,7 +16,6 @@ EMAIL_IP_LIMIT = 30
 EMAIL_IP_LIMIT_WINDOW_SECONDS = 600
 
 CODE_KEY_TEMPLATE = "admin:auth:email-code:{scene}:{email}"
-RESEND_KEY_TEMPLATE = "admin:auth:email-code:resend:{scene}:{email}"
 IP_KEY_TEMPLATE = "admin:auth:email-code:ip:{ip}"
 ATTEMPT_KEY_TEMPLATE = "admin:auth:email-code:attempt:{scene}:{email}"
 
@@ -36,14 +35,7 @@ class VerificationCodeService:
 
         await self._check_ip_limit(client_ip)
 
-        code_key = CODE_KEY_TEMPLATE.format(scene=scene_value, email=email)
-        resend_key = RESEND_KEY_TEMPLATE.format(scene=scene_value, email=email)
-        # 已有有效验证码时需要等待冷却时间；验证码已过期或被消费则可立即重新获取
-        if await self._redis.exists(code_key):
-            ttl = await self._redis.ttl(resend_key)
-            if ttl is not None and ttl > 0:
-                raise TooManyRequestsError(f"验证码发送过于频繁，请 {ttl} 秒后再试")
-
+        # 不做重发冷却：前端点击发送后自行倒计时，服务端每次请求都重新发码
         code = generate_email_code()
         await self._email_service.send_verification_code(email, code, scene_value)
 
@@ -53,7 +45,6 @@ class VerificationCodeService:
             code,
             ex=self._settings.email_code_expire_seconds,
         )
-        pipe.set(resend_key, "1", ex=self._settings.email_code_resend_seconds)
         pipe.delete(ATTEMPT_KEY_TEMPLATE.format(scene=scene_value, email=email))
         await pipe.execute()
         return self._settings.email_code_expire_seconds

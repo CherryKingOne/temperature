@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import logging
+import sys
+from email.message import EmailMessage
 
 import aiosmtplib
-from email.message import EmailMessage
 
 from app.core.config import Settings
 from app.core.errors import ServiceUnavailableError
@@ -21,13 +22,26 @@ SCENE_SUBJECTS = {
 
 
 class EmailService:
-    """基于 SMTP 的真实邮件发送服务。"""
+    """验证码投递服务。
+
+    - ``smtp`` 后端：经真实 SMTP 服务器把验证码邮件发出去；
+    - ``console`` 后端：验证码只打印到服务标准输出（本地开发用，不需要任何邮件容器）。
+
+    两种后端都不改变验证码本身的生成与校验逻辑：验证码依旧真实写入 Redis，
+    ``console`` 只是把"投递"这一步从 SMTP 换成了终端输出。
+    """
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
 
     @property
+    def is_console(self) -> bool:
+        return self._settings.email_backend == "console"
+
+    @property
     def is_configured(self) -> bool:
+        if self.is_console:
+            return True
         return bool(self._settings.smtp_host and self._settings.smtp_from_email)
 
     async def send_verification_code(self, email: str, code: str, scene: str) -> None:
@@ -36,6 +50,10 @@ class EmailService:
             raise ServiceUnavailableError("邮件服务未配置，无法发送验证码")
 
         subject = SCENE_SUBJECTS.get(scene, "平台验证码")
+        if self.is_console:
+            self._print_to_console(email, code, subject)
+            return
+
         message = EmailMessage()
         message["Subject"] = f"【{FROM_NAME}】{subject}"
         message["From"] = f"{FROM_NAME} <{self._settings.smtp_from_email}>"
@@ -70,3 +88,32 @@ class EmailService:
         except OSError as exc:
             logger.exception("SMTP 连接失败")
             raise ServiceUnavailableError("邮件服务不可用，请稍后再试") from exc
+
+    def _print_to_console(self, email: str, code: str, subject: str) -> None:
+        """把验证码打印到标准输出（EMAIL_BACKEND=console）。"""
+        minutes = self._settings.email_code_expire_seconds // 60
+        separator = "=" * 60
+        text = (
+            f"\n{separator}\n"
+            f"【console 邮件】{subject}\n"
+            f"收件人：{email}\n"
+            f"验证码：{code}\n"
+            f"有效期：{minutes} 分钟\n"
+            f"（EMAIL_BACKEND=console：邮件未真实发送，仅打印到服务输出）\n"
+            f"{separator}\n"
+        )
+        _write_stdout(text)
+
+
+def _write_stdout(text: str) -> None:
+    """写标准输出；终端编码装不下中文时直接写 UTF-8 字节，避免乱码或报错。"""
+    stream = sys.stdout
+    try:
+        stream.write(text)
+        stream.flush()
+    except UnicodeEncodeError:
+        buffer = getattr(stream, "buffer", None)
+        if buffer is None:
+            raise
+        buffer.write(text.encode("utf-8", errors="replace"))
+        buffer.flush()

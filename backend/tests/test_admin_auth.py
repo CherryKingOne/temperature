@@ -373,11 +373,30 @@ async def test_send_email_code_rejects_wrong_scene(client):
     assert response.json()["code"] == 40001
 
 
-async def test_send_email_code_is_rate_limited(client):
-    email = unique_email("rate")
+async def test_send_email_code_has_no_resend_cooldown(client, email_code):
+    """服务端不做重发冷却（60 秒倒计时由前端负责），连续发送都成功。"""
+    email = unique_email("resend")
     await request_code(client, email)
+    first_code = await email_code(email)
+
     response = await client.post(
         f"{API}/send-email-code", json={"email": email, "scene": "register"}
+    )
+    assert response.status_code == 200
+    assert response.json()["code"] == 0
+
+    second_code = await email_code(email)
+    assert second_code != first_code
+
+
+async def test_send_email_code_is_rate_limited_per_ip(client):
+    """同一 IP 10 分钟内超过 30 次发送时返回 42900。"""
+    for _ in range(30):
+        await request_code(client, unique_email("ip"))
+
+    response = await client.post(
+        f"{API}/send-email-code",
+        json={"email": unique_email("ip"), "scene": "register"},
     )
     assert response.status_code == 429
     assert response.json()["code"] == 42900
