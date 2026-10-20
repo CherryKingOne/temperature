@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `admin_user` (
     `id`            BIGINT       NOT NULL COMMENT '雪花 ID',
     `name`          VARCHAR(50)  NOT NULL COMMENT '姓名',
     `email`         VARCHAR(254) NOT NULL COMMENT '登录邮箱',
+    `phone`         VARCHAR(20)  NULL COMMENT '手机号',
     `password_hash` VARCHAR(255) NOT NULL COMMENT 'bcrypt 密码哈希',
     `role`          ENUM ('SUPER_ADMIN', 'ADMIN')   NOT NULL DEFAULT 'ADMIN' COMMENT '角色',
     `status`        ENUM ('ACTIVE', 'DISABLED')    NOT NULL DEFAULT 'ACTIVE' COMMENT '账号状态',
@@ -37,6 +38,15 @@ CREATE TABLE IF NOT EXISTS `admin_user` (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 """
 
+# 增量迁移：为已建库补齐后加的字段（执行前先检查列是否存在）
+MIGRATION_SQL = """
+ALTER TABLE `admin_user` ADD COLUMN `phone` VARCHAR(20) NULL COMMENT '手机号' AFTER `email`;
+"""
+
+MIGRATION_COLUMNS = {
+    "admin_user": {"phone"},
+}
+
 
 def load_statements() -> list[str]:
     """把建表语句拆成可逐条执行的 SQL。"""
@@ -45,7 +55,42 @@ def load_statements() -> list[str]:
     return [statement.strip() for statement in body.split(";") if statement.strip()]
 
 
+async def _column_exists(conn: AsyncConnection, table: str, column: str) -> bool:
+    """查询列是否已存在。"""
+    result = await conn.execute(
+        text(
+            "SELECT COUNT(*) FROM information_schema.COLUMNS "
+            "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table AND COLUMN_NAME = :column"
+        ),
+        {"table": table, "column": column},
+    )
+    return int(result.scalar_one()) > 0
+
+
 async def init_schema(conn: AsyncConnection) -> None:
     """在给定连接上建表（幂等，应用启动时调用）。"""
     for statement in load_statements():
         await conn.execute(text(statement))
+    await run_migrations(conn)
+
+
+async def run_migrations(conn: AsyncConnection) -> None:
+    """执行增量迁移：只补齐缺失的字段，已存在的库不会被破坏。"""
+    for table, columns in MIGRATION_COLUMNS.items():
+        for column in columns:
+            if await _column_exists(conn, table, column):
+                continue
+            for statement in load_migrations(table, column):
+                await conn.execute(text(statement))
+
+
+def load_migrations(table: str, column: str) -> list[str]:
+    """取出与指定表 / 字段相关的迁移语句。"""
+    statements = []
+    for statement in MIGRATION_SQL.split(";"):
+        cleaned = statement.strip()
+        if not cleaned:
+            continue
+        if f"`{table}`" in cleaned and f"`{column}`" in cleaned:
+            statements.append(cleaned)
+    return statements

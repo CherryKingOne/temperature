@@ -40,6 +40,7 @@ from app.schemas.admin.auth import (
     SendEmailCodeRequest,
     SendEmailCodeResponse,
     TokenPairOut,
+    UpdateProfileRequest,
 )
 from app.services.admin.verification_service import VerificationCodeService
 
@@ -119,6 +120,7 @@ class AuthService:
                     id=next_id(),
                     name=payload.name,
                     email=email,
+                    phone=payload.phone or None,
                     password_hash=password_hash,
                     role=role,
                     status=AdminStatus.ACTIVE,
@@ -229,6 +231,18 @@ class AuthService:
         return self._to_out(user)
 
     # ------------------------------------------------------------------
+    # 个人资料
+    # ------------------------------------------------------------------
+    async def update_profile(self, admin: AdminUser, payload: UpdateProfileRequest) -> AdminUserOut:
+        """修改自身资料（姓名、手机号）。"""
+        admin.name = payload.name
+        admin.phone = payload.phone or None
+        await self._session.commit()
+        await self._session.refresh(admin)
+        logger.info("管理员更新资料 admin_id=%s", admin.id)
+        return self._to_out(admin)
+
+    # ------------------------------------------------------------------
     # 密码
     # ------------------------------------------------------------------
     async def change_password(self, admin: AdminUser, payload: ChangePasswordRequest) -> None:
@@ -322,6 +336,7 @@ class AuthService:
             id=str(user.id),
             name=user.name,
             email=user.email,
+            phone=user.phone,
             role=user.role.value,
             is_super_admin=user.role == AdminRole.SUPER_ADMIN,
             status=user.status.value,

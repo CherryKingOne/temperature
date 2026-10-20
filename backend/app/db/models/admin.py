@@ -32,6 +32,7 @@ class AdminUser(Base, TimestampMixin):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
     name: Mapped[str] = mapped_column(String(50), nullable=False, comment="姓名")
     email: Mapped[str] = mapped_column(String(254), nullable=False, comment="登录邮箱")
+    phone: Mapped[str | None] = mapped_column(String(20), nullable=True, comment="手机号")
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False, comment="bcrypt 密码哈希")
     role: Mapped[AdminRole] = mapped_column(
         Enum(

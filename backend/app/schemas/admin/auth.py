@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+import re
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
@@ -19,6 +20,14 @@ def _validate_password_bytes(value: str) -> str:
     if len(value.encode("utf-8")) > MAX_PASSWORD_BYTES:
         raise ValueError(f"密码长度不能超过 {MAX_PASSWORD_BYTES} 字节")
     return value
+
+
+def _normalize_phone(value: str | None) -> str | None:
+    """规范化手机号：去掉空格与分隔符；空值统一为 None。"""
+    if value is None:
+        return None
+    cleaned = re.sub(r"[\s\-()]", "", value).strip()
+    return cleaned or None
 
 
 class SendEmailCodeRequest(BaseModel):
@@ -45,6 +54,7 @@ class RegisterRequest(BaseModel):
 
     name: str = Field(min_length=2, max_length=50, description="姓名")
     email: EmailStr = Field(description="邮箱")
+    phone: str = Field(default="", max_length=20, description="手机号（可空）")
     code: str = Field(description="邮箱验证码（纯数字）")
     password: str = Field(min_length=8, description="密码")
     password_confirm: str = Field(min_length=8, description="确认密码")
@@ -53,6 +63,11 @@ class RegisterRequest(BaseModel):
     @classmethod
     def _normalize_email(cls, value: str) -> str:
         return value.strip().lower()
+
+    @field_validator("phone")
+    @classmethod
+    def _normalize_phone_field(cls, value: str) -> str:
+        return _normalize_phone(value) or ""
 
     @field_validator("name")
     @classmethod
@@ -163,6 +178,23 @@ class ResetPasswordRequest(BaseModel):
         return self
 
 
+class UpdateProfileRequest(BaseModel):
+    """修改自身资料（姓名、手机号）。"""
+
+    name: str = Field(min_length=2, max_length=50, description="姓名")
+    phone: str = Field(default="", max_length=20, description="手机号（可空）")
+
+    @field_validator("name")
+    @classmethod
+    def _strip_name(cls, value: str) -> str:
+        return value.strip()
+
+    @field_validator("phone")
+    @classmethod
+    def _normalize_phone_field(cls, value: str) -> str:
+        return _normalize_phone(value) or ""
+
+
 class AdminUserOut(BaseModel):
     """管理员信息（对外输出）。"""
 
@@ -172,6 +204,7 @@ class AdminUserOut(BaseModel):
     id: str
     name: str
     email: str
+    phone: str | None = None
     role: str
     is_super_admin: bool
     status: str
