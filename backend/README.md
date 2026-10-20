@@ -58,13 +58,10 @@ backend/data/                 # 随仓库位置自适应，服务器换目录也
 ├── mysql/                    # docker compose 挂载的 MySQL 数据目录
 ├── redis/                    # docker compose 挂载的 Redis 持久化目录
 ├── mailpit/                  # docker compose 挂载的邮件收件箱目录
-├── mysql-local/              # 可选：本机直跑 mysqld 的数据目录（与上面分开，避免冲突）
-├── run/                      # socket、pid（仅本机直跑时使用）
-├── logs/                     # mysqld 日志（仅本机直跑时使用）
 └── .gitkeep
 ```
 
-`backend/data/*` 已在 `.gitignore` 中忽略（仅保留 `.gitkeep`），数据不会进版本库。
+这三个目录就是 `docker-compose.yml` 里的挂载点，由 Docker 自动创建与初始化；`backend/data/*` 已在 `.gitignore` 中忽略（仅保留 `.gitkeep`），数据不会进版本库。
 
 ### 1. 启动依赖服务
 
@@ -73,9 +70,10 @@ cd ..                     # 项目根目录 temperature/
 docker compose up -d      # MySQL 8 + Redis 7 + Mailpit(本地收信)
 ```
 
-MySQL 容器会自动建库并创建账号：`temperature/temperature`（业务库 `temperature`）、`root/root`（管理用）。测试库 `temperature_test` 由测试夹具自动创建。
+MySQL 容器会自动建库并创建账号：`temperature/temperature123`（业务库 `temperature`）、`root/root`（管理用）。Redis 密码与 MySQL 业务密码一致（`temperature123`）。测试库 `temperature_test` 由测试夹具自动创建。
 
-> 如果不想用 Docker，也可以用本机安装的 MySQL：把数据目录放在 `backend/data/mysql-local`（与 compose 挂载目录分开，两种实例不会互相污染），用 `mysqld --defaults-file=<backend>/data/my.cnf` 启动即可，`.env` 里的连接信息保持不变。
+> 如果不用 Docker 而用本机安装的 MySQL：把数据目录放在仓库外（如 `/opt/homebrew/var/mysql`），`backend/data/` 留给 compose 挂载，两者不要混用；`.env` 里的连接信息保持不变即可。
+> 本机已装 MySQL/Redis 且占用了 3306/6379 时，先停掉本地服务再 `docker compose up -d`（端口冲突）。
 
 ### 2. 准备数据库与账号
 
