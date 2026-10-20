@@ -21,7 +21,6 @@ interface MenuItem {
 }
 
 const MENU: MenuItem[] = [
-  { key: 'profile', title: '个人中心', icon: 'user', path: '/profile' },
   { key: 'home', title: '首页', icon: 'home', path: '/home' },
   { key: 'admin', title: '管理员管理', icon: 'user' },
   { key: 'system', title: '系统设置', icon: 'cog' },
@@ -40,7 +39,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="layout">
+  <div class="layout" :class="{ 'is-collapsed': collapsed }">
     <header class="layout__navbar">
       <div class="layout__navbar-left">
         <button class="layout__collapse" title="收起/展开菜单" @click="collapsed = !collapsed">
@@ -157,6 +156,16 @@ onMounted(async () => {
   width: var(--sidebar-width-collapsed);
 }
 
+/* 收起态：只留图标并居中，文字隐藏 */
+.layout.is-collapsed .layout__menu-item {
+  justify-content: center;
+  padding: 14px 0;
+}
+
+.layout.is-collapsed .layout__menu-text {
+  display: none;
+}
+
 .layout__menu {
   padding: 8px 0;
 }
@@ -205,6 +214,10 @@ onMounted(async () => {
   padding-top: var(--navbar-height);
   padding-left: var(--sidebar-width);
   transition: padding-left var(--transition);
+}
+
+.layout.is-collapsed .layout__content {
+  padding-left: var(--sidebar-width-collapsed);
 }
 
 .layout__view {
