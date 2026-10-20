@@ -22,7 +22,7 @@ interface MenuItem {
 
 const MENU: MenuItem[] = [
   { key: 'home', title: '首页', icon: 'home', path: '/home' },
-  { key: 'admin', title: '管理员管理', icon: 'user' },
+  { key: 'admin', title: '人员管理', icon: 'user', path: '/admin/personnel' },
   { key: 'system', title: '系统设置', icon: 'cog' },
 ]
 

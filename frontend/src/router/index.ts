@@ -39,6 +39,12 @@ const router = createRouter({
           component: () => import('@/views/HomeView.vue'),
           meta: { title: '首页' },
         },
+        {
+          path: 'admin/personnel',
+          name: 'personnel',
+          component: () => import('@/views/admin/PersonnelView.vue'),
+          meta: { title: '人员管理' },
+        },
       ],
     },
     {
