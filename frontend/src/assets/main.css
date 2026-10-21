@@ -1,4 +1,348 @@
-@import './base.css';
-@import './theme.css';
-@import './components.css';
-@import './utils.css';
+/**
+ * 全局样式入口（Tailwind CSS v4）
+ *
+ * - @theme：设计令牌（间距 / 字号 / 圆角 / 颜色 / 阴影），编译为 Tailwind 工具类
+ * - --app-*：运行时主题变量，由 <html data-theme|data-theme-mode|data-sidebar> 切换
+ * - @layer base：排版与滚动条等基础样式
+ *
+ * 主题色通过 <html data-theme="blue|green|red|yellow|purple"> 切换；
+ * 明暗模式通过 <html data-theme-mode="light|dark"> 切换；
+ * 侧边栏主题通过 <html data-sidebar="dark|light|deep"> 切换。
+ */
+
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+ * 设计令牌（静态）
+ * ------------------------------------------------------------------ */
+@theme {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+
+  /* 间距沿用 Tailwind 默认基数 0.25rem（4px），原 5px 步进用 1.25 / 2.5 / 3.75 表达 */
+
+  /* 字号：主标题 18/16px，正文 14/13px，辅助 12/10px */
+  --text-2xs: 10px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 20px;
+  --text-xs--line-height: 1.4;
+  --text-sm--line-height: 1.42857143;
+  --text-base--line-height: 1.42857143;
+  --text-lg--line-height: 1.4;
+  --text-xl--line-height: 1.4;
+  --text-2xl--line-height: 1.4;
+
+  /* 圆角 */
+  --radius-sm: 3px;
+  --radius: 4px;
+  --radius-lg: 8px;
+
+  /* 控件与布局尺寸 */
+  --spacing-control: 34px;
+  --spacing-control-sm: 28px;
+  --spacing-navbar: 50px;
+  --spacing-sidebar: 200px;
+  --spacing-sidebar-collapsed: 70px;
+  --spacing-tabs: 36px;
+
+  /* 动画 */
+  --animate-toast-in: toast-in 0.25s ease;
+  --animate-spinner: spinner-rotate 0.8s linear infinite;
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes spinner-rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/* ------------------------------------------------------------------
+ * 运行时主题变量 → Tailwind 颜色 / 阴影工具类
+ * ------------------------------------------------------------------ */
+@theme inline {
+  --color-primary: var(--app-primary);
+  --color-primary-active: var(--app-primary-active);
+  --color-primary-hover: var(--app-primary-hover);
+  --color-primary-active-hover: var(--app-primary-active-hover);
+  --color-primary-light: var(--app-primary-light);
+  --color-primary-border: var(--app-primary-border);
+
+  --color-bg: var(--app-bg);
+  --color-surface: var(--app-surface);
+  --color-surface-alt: var(--app-surface-alt);
+  --color-card-header-bg: var(--app-card-header-bg);
+  --color-border: var(--app-border);
+  --color-border-light: var(--app-border-light);
+  --color-border-lighter: var(--app-border-lighter);
+  --color-text: var(--app-text);
+  --color-text-secondary: var(--app-text-secondary);
+  --color-text-placeholder: var(--app-text-placeholder);
+  --color-table-header-bg: var(--app-table-header-bg);
+  --color-hover: var(--app-hover);
+  --color-mask: var(--app-mask);
+  --color-disabled-bg: var(--app-disabled-bg);
+  --color-disabled-text: var(--app-disabled-text);
+
+  --color-success: var(--app-success);
+  --color-success-active: var(--app-success-active);
+  --color-warning: var(--app-warning);
+  --color-warning-active: var(--app-warning-active);
+  --color-danger: var(--app-danger);
+  --color-danger-active: var(--app-danger-active);
+  --color-info: var(--app-info);
+  --color-info-active: var(--app-info-active);
+
+  --color-sidebar-bg: var(--app-sidebar-bg);
+  --color-sidebar-active-bg: var(--app-sidebar-active-bg);
+  --color-sidebar-hover-bg: var(--app-sidebar-hover-bg);
+  --color-sidebar-text: var(--app-sidebar-text);
+  --color-sidebar-text-active: var(--app-sidebar-text-active);
+  --color-sidebar-border: var(--app-sidebar-border);
+
+  --shadow-card: var(--app-shadow-card);
+  --shadow-popup: var(--app-shadow-popup);
+  --shadow-logo: var(--app-shadow-logo);
+}
+
+/* ------------------------------------------------------------------
+ * 运行时主题变量（默认值 + 各主题覆盖）
+ * ------------------------------------------------------------------ */
+:root {
+  --app-transition: 0.3s ease;
+
+  /* 局部覆盖变量：认证页等场景通过 Tailwind 任意属性覆盖 */
+  --label-color: var(--app-text-secondary);
+  --error-color: var(--app-danger);
+  --tip-color: var(--app-text-placeholder);
+  --input-bg: var(--app-surface);
+  --input-color: var(--app-text);
+  --input-placeholder: var(--app-text-placeholder);
+  --checkbox-bg: var(--app-surface);
+  --checkbox-border: var(--app-border);
+  --checkbox-color: var(--app-text-secondary);
+
+  /* 主题色（默认蓝色系） */
+  --app-primary: #3c8dbc;
+  --app-primary-active: #1890ff;
+  --app-primary-hover: #4a99c7;
+  --app-primary-active-hover: #33a0ff;
+  --app-primary-light: rgba(60, 141, 188, 0.12);
+  --app-primary-border: rgba(60, 141, 188, 0.35);
+
+  /* 语义色 */
+  --app-success: #1ab394;
+  --app-success-active: #16a085;
+  --app-warning: #f8ac59;
+  --app-warning-active: #f0932b;
+  --app-danger: #ed5565;
+  --app-danger-active: #d9363e;
+  --app-info: #23c6c8;
+  --app-info-active: #14b9bb;
+
+  /* 侧边栏主题（默认深色） */
+  --app-sidebar-bg: #2f4050;
+  --app-sidebar-active-bg: #293846;
+  --app-sidebar-hover-bg: #293846;
+  --app-sidebar-text: #bfcbd9;
+  --app-sidebar-text-active: #fff;
+  --app-sidebar-border: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='blue'] {
+  --app-primary: #3c8dbc;
+  --app-primary-active: #1890ff;
+  --app-primary-hover: #4a99c7;
+  --app-primary-active-hover: #33a0ff;
+  --app-primary-light: rgba(60, 141, 188, 0.12);
+  --app-primary-border: rgba(60, 141, 188, 0.35);
+}
+
+[data-theme='green'] {
+  --app-primary: #00a65a;
+  --app-primary-active: #52c41a;
+  --app-primary-hover: #0eb567;
+  --app-primary-active-hover: #6cd35c;
+  --app-primary-light: rgba(0, 166, 90, 0.12);
+  --app-primary-border: rgba(0, 166, 90, 0.35);
+}
+
+[data-theme='red'] {
+  --app-primary: #dd4b39;
+  --app-primary-active: #f5222d;
+  --app-primary-hover: #e05a49;
+  --app-primary-active-hover: #ff4052;
+  --app-primary-light: rgba(221, 75, 57, 0.12);
+  --app-primary-border: rgba(221, 75, 57, 0.35);
+}
+
+[data-theme='yellow'] {
+  --app-primary: #f39c12;
+  --app-primary-active: #faad14;
+  --app-primary-hover: #f5a623;
+  --app-primary-active-hover: #fbbd22;
+  --app-primary-light: rgba(243, 156, 18, 0.12);
+  --app-primary-border: rgba(243, 156, 18, 0.35);
+}
+
+[data-theme='purple'] {
+  --app-primary: #605ca8;
+  --app-primary-active: #722ed1;
+  --app-primary-hover: #6d69b8;
+  --app-primary-active-hover: #8c46e0;
+  --app-primary-light: rgba(96, 92, 168, 0.12);
+  --app-primary-border: rgba(96, 92, 168, 0.35);
+}
+
+[data-sidebar='light'] {
+  --app-sidebar-bg: #f9fafc;
+  --app-sidebar-active-bg: #e9edf2;
+  --app-sidebar-hover-bg: #eef1f5;
+  --app-sidebar-text: #5a6472;
+  --app-sidebar-text-active: var(--app-primary);
+  --app-sidebar-border: #e5e6e7;
+}
+
+[data-sidebar='deep'] {
+  --app-sidebar-bg: rgba(15, 41, 80, 1);
+  --app-sidebar-active-bg: rgba(15, 41, 80, 0.75);
+  --app-sidebar-hover-bg: rgba(15, 41, 80, 0.75);
+  --app-sidebar-text: #b6c2d1;
+  --app-sidebar-text-active: #fff;
+  --app-sidebar-border: rgba(255, 255, 255, 0.06);
+}
+
+/* 明暗模式（默认明亮） */
+:root,
+[data-theme-mode='light'] {
+  --app-bg: #f3f3f4;
+  --app-surface: #fff;
+  --app-surface-alt: #fafafa;
+  --app-card-header-bg: #f0f3f4;
+  --app-border: #ddd;
+  --app-border-light: #e5e6e7;
+  --app-border-lighter: #e7eaec;
+  --app-text: #333;
+  --app-text-secondary: #777;
+  --app-text-placeholder: #999;
+  --app-table-header-bg: #eff3f8;
+  --app-hover: #f5f5f5;
+  --app-mask: rgba(0, 0, 0, 0.5);
+  --app-disabled-bg: #f5f7fa;
+  --app-disabled-text: #c0c4cc;
+  --app-shadow-card: 0 1px 1px rgba(0, 0, 0, 0.1);
+  --app-shadow-popup: 0 2px 12px rgba(0, 0, 0, 0.1);
+  --app-shadow-logo: 0 1px 1px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme-mode='dark'] {
+  --app-bg: #1f1f1f;
+  --app-surface: #2b2b2b;
+  --app-surface-alt: #333;
+  --app-card-header-bg: #333;
+  --app-border: #3a3a3a;
+  --app-border-light: #434343;
+  --app-border-lighter: #3d3d3d;
+  --app-text: #e0e0e0;
+  --app-text-secondary: #a5a5a5;
+  --app-text-placeholder: #767676;
+  --app-table-header-bg: #333;
+  --app-hover: #353535;
+  --app-mask: rgba(0, 0, 0, 0.65);
+  --app-disabled-bg: #383838;
+  --app-disabled-text: #6a6a6a;
+  --app-shadow-card: 0 1px 1px rgba(0, 0, 0, 0.4);
+  --app-shadow-popup: 0 2px 12px rgba(0, 0, 0, 0.5);
+  --app-shadow-logo: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+/* ------------------------------------------------------------------
+ * 基础样式
+ * ------------------------------------------------------------------ */
+@layer base {
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: var(--app-text);
+    background-color: var(--app-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  h2 {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  h3 {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  a {
+    color: var(--app-primary);
+    text-decoration: none;
+    transition: color var(--app-transition);
+  }
+
+  a:hover {
+    color: var(--app-primary-active);
+  }
+
+  /* 滚动条：与整体风格一致的细滚动条 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}

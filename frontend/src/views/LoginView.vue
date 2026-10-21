@@ -80,14 +80,25 @@ async function onSubmit(): Promise<void> {
 
 <template>
   <AuthLayout title="账号登录" subtitle="请使用管理员邮箱登录管理后台">
-    <form class="form" novalidate @submit.prevent="onSubmit">
-      <div v-if="errorMessage" class="auth__error">
+    <form
+      class="w-full [--checkbox-bg:rgba(255,255,255,0.15)] [--checkbox-border:rgba(255,255,255,0.5)] [--checkbox-color:rgba(255,255,255,0.85)] [--error-color:#ffd7d7] [--input-bg:#fff] [--input-placeholder:#bbb] [--label-color:rgba(255,255,255,0.85)]"
+      novalidate
+      @submit.prevent="onSubmit"
+    >
+      <div
+        v-if="errorMessage"
+        class="mb-4 flex items-center gap-1.5 rounded-sm bg-[rgba(221,75,57,0.75)] px-3 py-2 text-sm text-[#ffecec]"
+      >
         <FaIcon name="exclamation-circle" :size="15" />
         <span>{{ errorMessage }}</span>
       </div>
 
-      <div class="form-item">
-        <label class="form-item__label form-item__label--required" for="login-email">邮箱</label>
+      <div class="relative mb-5">
+        <label
+          class="mb-1.5 block text-sm text-[var(--label-color)] before:mr-1 before:text-danger before:content-['*']"
+          for="login-email"
+          >邮箱</label
+        >
         <BaseInput
           id="login-email"
           v-model="email"
@@ -97,11 +108,17 @@ async function onSubmit(): Promise<void> {
           :error="errors.email"
           autocomplete="username"
         />
-        <p v-if="errors.email" class="form-item__error">{{ errors.email }}</p>
+        <p v-if="errors.email" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-[var(--error-color)]">
+          {{ errors.email }}
+        </p>
       </div>
 
-      <div class="form-item">
-        <label class="form-item__label form-item__label--required" for="login-password">密码</label>
+      <div class="relative mb-5">
+        <label
+          class="mb-1.5 block text-sm text-[var(--label-color)] before:mr-1 before:text-danger before:content-['*']"
+          for="login-password"
+          >密码</label
+        >
         <BaseInput
           id="login-password"
           v-model="password"
@@ -112,19 +129,23 @@ async function onSubmit(): Promise<void> {
           password-toggle
           autocomplete="current-password"
         />
-        <p v-if="errors.password" class="form-item__error">{{ errors.password }}</p>
+        <p v-if="errors.password" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-[var(--error-color)]">
+          {{ errors.password }}
+        </p>
       </div>
 
-      <div class="auth__row">
+      <div class="mb-5 flex items-center justify-between text-sm">
         <BaseCheckbox v-model="remember" label="记住邮箱" />
-        <span class="auth__link">没有账号？<router-link to="/register">立即注册</router-link></span>
+        <span class="text-sm text-white hover:text-white/80"
+          >没有账号？<router-link to="/register">立即注册</router-link></span
+        >
       </div>
 
       <BaseButton type="primary" size="large" block :loading="submitting" native-type="submit">
         {{ submitting ? '登录中...' : '登 录' }}
       </BaseButton>
 
-      <p class="auth__tip">登录即表示同意平台服务条款与隐私政策</p>
+      <p class="mt-[18px] text-center text-sm text-white/85">登录即表示同意平台服务条款与隐私政策</p>
     </form>
   </AuthLayout>
 </template>

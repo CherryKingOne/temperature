@@ -70,7 +70,7 @@ function validate(): boolean {
     next.newPassword = '新密码不能与原密码相同'
   }
   if (confirmPassword.value !== newPassword.value) {
-    next.confirmPassword = '两次输入的新密码不一致'
+    next.newPassword = '两次输入的新密码不一致'
   }
   errors.value = next
   return Object.keys(next).length === 0
@@ -170,164 +170,231 @@ async function saveEdit(): Promise<void> {
 </script>
 
 <template>
-  <div class="profile">
+  <div class="flex items-start gap-[15px] max-[900px]:flex-col">
     <!-- 加载中 / 加载失败 -->
-    <div v-if="loading" class="card profile__state">
-      <div class="card__body flex-center gap10">
-        <span class="spinner" />
-        <span class="text-secondary text-sm">正在加载账号信息...</span>
+    <div v-if="loading" class="w-full rounded border border-border bg-surface shadow-card">
+      <div class="flex items-center justify-center gap-2.5 p-[15px]">
+        <span
+          class="inline-block h-3.5 w-3.5 animate-spinner rounded-full border-2 border-current border-t-transparent"
+        />
+        <span class="text-sm text-text-secondary">正在加载账号信息...</span>
       </div>
     </div>
 
-    <div v-else-if="loadError" class="card profile__state">
-      <div class="card__body flex-center gap10">
+    <div v-else-if="loadError" class="w-full rounded border border-border bg-surface shadow-card">
+      <div class="flex items-center justify-center gap-2.5 p-[15px]">
         <FaIcon name="exclamation-circle" :size="15" />
-        <span class="text-danger text-sm">{{ loadError }}</span>
+        <span class="text-sm text-danger">{{ loadError }}</span>
         <BaseButton size="small" @click="onReload">重新加载</BaseButton>
       </div>
     </div>
 
     <template v-else>
       <!-- 左侧：个人名片 -->
-      <aside class="profile__side">
-        <div class="card">
-          <div class="card__body profile__card">
-            <span class="profile__avatar">{{ avatarText }}</span>
-            <p class="profile__name">{{ auth.admin?.name ?? '加载中...' }}</p>
-            <p class="profile__email">{{ auth.admin?.email ?? '-' }}</p>
-            <p v-if="auth.admin?.phone" class="profile__email">{{ auth.admin.phone }}</p>
-            <span class="profile__role" :class="{ 'is-super': auth.isSuperAdmin }">{{
-              roleText
-            }}</span>
+      <aside class="w-[280px] shrink-0 max-[900px]:w-full">
+        <div class="rounded border border-border bg-surface shadow-card">
+          <div class="flex flex-col items-center p-[15px] text-center">
+            <span
+              class="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary text-[26px] text-white"
+              >{{ avatarText }}</span
+            >
+            <p class="text-lg font-medium">{{ auth.admin?.name ?? '加载中...' }}</p>
+            <p class="mx-0 my-1 mb-2.5 break-all text-sm text-text-secondary">
+              {{ auth.admin?.email ?? '-' }}
+            </p>
+            <p v-if="auth.admin?.phone" class="mx-0 my-1 mb-2.5 break-all text-sm text-text-secondary">
+              {{ auth.admin.phone }}
+            </p>
+            <span
+              class="rounded-[2px] px-2.5 py-0.5 text-xs"
+              :class="
+                auth.isSuperAdmin
+                  ? 'bg-[rgba(243,156,18,0.14)] text-warning'
+                  : 'bg-primary-light text-primary'
+              "
+              >{{ roleText }}</span
+            >
           </div>
         </div>
 
-        <div class="card mt15">
-          <div class="card__header"><span>账号概况</span></div>
-          <ul class="profile__summary">
-            <li class="profile__summary-item">
-              <span class="profile__summary-label">账号状态</span>
+        <div class="mt-[15px] rounded border border-border bg-surface shadow-card">
+          <div
+            class="flex h-[41px] items-center justify-between border-b border-border-lighter bg-card-header-bg px-[15px] text-base"
+          >
+            <span>账号概况</span>
+          </div>
+          <ul class="px-[15px] pt-1.5 pb-3.5">
+            <li
+              class="flex items-center justify-between gap-2.5 border-b border-dashed border-border-lighter py-1.5 text-sm last:border-b-0"
+            >
+              <span class="whitespace-nowrap text-text-secondary">账号状态</span>
               <span
-                class="profile__summary-value"
+                class="text-right break-all"
                 :class="{ 'text-success': auth.admin?.status === 'ACTIVE' }"
               >
                 {{ statusText }}
               </span>
             </li>
-            <li class="profile__summary-item">
-              <span class="profile__summary-label">账号 ID</span>
-              <span class="profile__summary-value">{{ auth.admin?.id ?? '-' }}</span>
+            <li
+              class="flex items-center justify-between gap-2.5 border-b border-dashed border-border-lighter py-1.5 text-sm last:border-b-0"
+            >
+              <span class="whitespace-nowrap text-text-secondary">账号 ID</span>
+              <span class="text-right break-all">{{ auth.admin?.id ?? '-' }}</span>
             </li>
-            <li class="profile__summary-item">
-              <span class="profile__summary-label">注册时间</span>
-              <span class="profile__summary-value">{{
-                formatDateTime(auth.admin?.created_at)
-              }}</span>
+            <li
+              class="flex items-center justify-between gap-2.5 border-b border-dashed border-border-lighter py-1.5 text-sm last:border-b-0"
+            >
+              <span class="whitespace-nowrap text-text-secondary">注册时间</span>
+              <span class="text-right break-all">{{ formatDateTime(auth.admin?.created_at) }}</span>
             </li>
-            <li class="profile__summary-item">
-              <span class="profile__summary-label">最近登录</span>
-              <span class="profile__summary-value">{{
-                formatDateTime(auth.admin?.last_login_at)
-              }}</span>
+            <li
+              class="flex items-center justify-between gap-2.5 border-b border-dashed border-border-lighter py-1.5 text-sm last:border-b-0"
+            >
+              <span class="whitespace-nowrap text-text-secondary">最近登录</span>
+              <span class="text-right break-all">{{ formatDateTime(auth.admin?.last_login_at) }}</span>
             </li>
           </ul>
         </div>
       </aside>
 
       <!-- 右侧：账号信息 + 安全设置 -->
-      <section class="profile__main">
-        <div class="card">
-          <div class="card__header">
+      <section class="min-w-0 flex-1">
+        <div class="rounded border border-border bg-surface shadow-card">
+          <div
+            class="flex h-[41px] items-center justify-between border-b border-border-lighter bg-card-header-bg px-[15px] text-base"
+          >
             <span>账号信息</span>
-            <span class="text-xs text-placeholder">数据来自服务端，仅本人可见</span>
+            <span class="text-xs text-text-placeholder">数据来自服务端，仅本人可见</span>
           </div>
-          <div class="card__body">
-            <table class="table profile__table">
+          <div class="p-[15px]">
+            <table
+              class="w-full text-sm text-text [&_th]:w-[110px] [&_th]:border-b [&_th]:border-border-lighter [&_th]:px-2 [&_th]:py-2 [&_th]:text-left [&_th]:font-normal [&_th]:text-text-secondary [&_td]:border-b [&_td]:border-border-lighter [&_td]:px-2 [&_td]:py-2 [&>tbody>tr>td:hover]:bg-hover"
+            >
               <tbody>
                 <tr>
-                  <th class="profile__table-label">姓名</th>
+                  <th>
+                    姓名
+                  </th>
                   <td>
-                    <span v-if="editingField !== 'name'" class="profile__value">
+                    <span v-if="editingField !== 'name'" class="inline-flex items-center gap-1.5">
                       {{ auth.admin?.name ?? '-' }}
-                      <button class="profile__edit" title="编辑姓名" @click="startEdit('name')">
+                      <button
+                        class="inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm text-text-placeholder transition-all duration-300 ease hover:bg-primary-light hover:text-primary"
+                        title="编辑姓名"
+                        @click="startEdit('name')"
+                      >
                         <FaIcon name="edit" :size="13" />
                       </button>
                     </span>
-                    <span v-else class="profile__edit-box">
+                    <span v-else class="inline-flex items-center gap-1.5">
                       <BaseInput
                         v-model="editValue"
-                        class="profile__edit-input"
+                        class="w-[180px]"
                         :error="editError"
                         @keyup.enter="saveEdit"
                         @keyup.esc="cancelEdit"
                       />
                       <button
-                        class="profile__edit-action"
+                        class="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm text-text-secondary transition-all duration-300 ease hover:bg-primary-light hover:text-primary disabled:cursor-not-allowed disabled:bg-transparent disabled:text-disabled-text"
                         title="保存"
                         :disabled="editSaving"
                         @click="saveEdit"
                       >
                         <FaIcon name="check" :size="13" />
                       </button>
-                      <button class="profile__edit-action" title="取消" @click="cancelEdit">
+                      <button
+                        class="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm text-text-secondary transition-all duration-300 ease hover:bg-primary-light hover:text-primary"
+                        title="取消"
+                        @click="cancelEdit"
+                      >
                         <FaIcon name="times" :size="13" />
                       </button>
                     </span>
                   </td>
-                  <th class="profile__table-label">登录邮箱</th>
+                  <th>
+                    登录邮箱
+                  </th>
                   <td>{{ auth.admin?.email ?? '-' }}</td>
                 </tr>
                 <tr>
-                  <th class="profile__table-label">手机号</th>
+                  <th>
+                    手机号
+                  </th>
                   <td>
-                    <span v-if="editingField !== 'phone'" class="profile__value">
+                    <span v-if="editingField !== 'phone'" class="inline-flex items-center gap-1.5">
                       <span v-if="auth.admin?.phone">{{ auth.admin.phone }}</span>
-                      <span v-else class="text-placeholder">未填写</span>
-                      <button class="profile__edit" title="编辑手机号" @click="startEdit('phone')">
+                      <span v-else class="text-text-placeholder">未填写</span>
+                      <button
+                        class="inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm text-text-placeholder transition-all duration-300 ease hover:bg-primary-light hover:text-primary"
+                        title="编辑手机号"
+                        @click="startEdit('phone')"
+                      >
                         <FaIcon name="edit" :size="13" />
                       </button>
                     </span>
-                    <span v-else class="profile__edit-box">
+                    <span v-else class="inline-flex items-center gap-1.5">
                       <BaseInput
                         v-model="editValue"
-                        class="profile__edit-input"
+                        class="w-[180px]"
                         placeholder="请输入手机号"
                         :error="editError"
                         @keyup.enter="saveEdit"
                         @keyup.esc="cancelEdit"
                       />
                       <button
-                        class="profile__edit-action"
+                        class="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm text-text-secondary transition-all duration-300 ease hover:bg-primary-light hover:text-primary disabled:cursor-not-allowed disabled:bg-transparent disabled:text-disabled-text"
                         title="保存"
                         :disabled="editSaving"
                         @click="saveEdit"
                       >
                         <FaIcon name="check" :size="13" />
                       </button>
-                      <button class="profile__edit-action" title="取消" @click="cancelEdit">
+                      <button
+                        class="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm text-text-secondary transition-all duration-300 ease hover:bg-primary-light hover:text-primary"
+                        title="取消"
+                        @click="cancelEdit"
+                      >
                         <FaIcon name="times" :size="13" />
                       </button>
                     </span>
                   </td>
-                  <th class="profile__table-label">角色</th>
+                  <th>
+                    角色
+                  </th>
                   <td>{{ roleText }}</td>
                 </tr>
                 <tr>
-                  <th class="profile__table-label">账号状态</th>
+                  <th>
+                    账号状态
+                  </th>
                   <td>{{ statusText }}</td>
-                  <th class="profile__table-label">账号 ID</th>
+                  <th>
+                    账号 ID
+                  </th>
                   <td>{{ auth.admin?.id ?? '-' }}</td>
                 </tr>
                 <tr>
-                  <th class="profile__table-label">创建时间</th>
-                  <td>{{ formatDateTime(auth.admin?.created_at) }}</td>
-                  <th class="profile__table-label">最近登录时间</th>
-                  <td>{{ formatDateTime(auth.admin?.last_login_at) }}</td>
+                  <th>
+                    创建时间
+                  </th>
+                  <td>
+                    {{ formatDateTime(auth.admin?.created_at) }}
+                  </td>
+                  <th>
+                    最近登录时间
+                  </th>
+                  <td>
+                    {{ formatDateTime(auth.admin?.last_login_at) }}
+                  </td>
                 </tr>
                 <tr>
-                  <th class="profile__table-label">最近登录 IP</th>
-                  <td>{{ auth.admin?.last_login_ip ?? '-' }}</td>
-                  <th class="profile__table-label"></th>
+                  <th>
+                    最近登录 IP
+                  </th>
+                  <td>
+                    {{ auth.admin?.last_login_ip ?? '-' }}
+                  </td>
+                  <th></th>
                   <td></td>
                 </tr>
               </tbody>
@@ -335,21 +402,29 @@ async function saveEdit(): Promise<void> {
           </div>
         </div>
 
-        <div class="card mt15">
-          <div class="card__header"><span>安全设置</span></div>
-          <div class="card__body">
-            <p class="profile__tip">
+        <div class="mt-[15px] rounded border border-border bg-surface shadow-card">
+          <div
+            class="flex h-[41px] items-center justify-between border-b border-border-lighter bg-card-header-bg px-[15px] text-base"
+          >
+            <span>安全设置</span>
+          </div>
+          <div class="p-[15px]">
+            <p
+              class="mb-[15px] flex items-center gap-1.5 rounded-sm bg-surface-alt px-3 py-2 text-xs text-text-secondary"
+            >
               <FaIcon name="exclamation-circle" :size="14" />
               修改密码需要邮箱验证码与当前密码，修改成功后当前账号的全部登录会话都会失效，需要重新登录。
             </p>
 
-            <form class="form profile__form" novalidate @submit.prevent="onSubmit">
-              <div class="profile__form-row">
-                <div class="form-item">
-                  <label class="form-item__label form-item__label--required" for="change-code"
+            <form class="w-full max-w-[720px]" novalidate @submit.prevent="onSubmit">
+              <div class="flex gap-5 max-[900px]:flex-col max-[900px]:gap-0">
+                <div class="relative flex-1">
+                  <label
+                    class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+                    for="change-code"
                     >邮箱验证码</label
                   >
-                  <div class="profile__code">
+                  <div class="flex gap-2.5">
                     <BaseInput
                       id="change-code"
                       v-model="code"
@@ -357,8 +432,10 @@ async function saveEdit(): Promise<void> {
                       placeholder="6 位数字验证码"
                       :error="errors.code"
                       autocomplete="one-time-code"
+                      class="flex-1"
                     />
                     <BaseButton
+                      class="w-[120px] shrink-0"
                       :disabled="remaining > 0"
                       :loading="sending"
                       type="primary"
@@ -368,16 +445,20 @@ async function saveEdit(): Promise<void> {
                       {{ remaining > 0 ? `${remaining}s 后重发` : '获取验证码' }}
                     </BaseButton>
                   </div>
-                  <p v-if="errors.code" class="form-item__error">{{ errors.code }}</p>
-                  <p class="form-item__tip">
+                  <p v-if="errors.code" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-danger">
+                    {{ errors.code }}
+                  </p>
+                  <p class="mt-1.5 text-xs text-text-placeholder">
                     验证码将发送到账号邮箱 {{ auth.admin?.email ?? '-' }}
                   </p>
                 </div>
               </div>
 
-              <div class="profile__form-row">
-                <div class="form-item">
-                  <label class="form-item__label form-item__label--required" for="old-password"
+              <div class="flex gap-5 max-[900px]:flex-col max-[900px]:gap-0">
+                <div class="relative flex-1">
+                  <label
+                    class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+                    for="old-password"
                     >当前密码</label
                   >
                   <BaseInput
@@ -390,13 +471,17 @@ async function saveEdit(): Promise<void> {
                     password-toggle
                     autocomplete="current-password"
                   />
-                  <p v-if="errors.oldPassword" class="form-item__error">{{ errors.oldPassword }}</p>
+                  <p v-if="errors.oldPassword" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-danger">
+                    {{ errors.oldPassword }}
+                  </p>
                 </div>
               </div>
 
-              <div class="profile__form-row">
-                <div class="form-item">
-                  <label class="form-item__label form-item__label--required" for="new-password"
+              <div class="flex gap-5 max-[900px]:flex-col max-[900px]:gap-0">
+                <div class="relative flex-1">
+                  <label
+                    class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+                    for="new-password"
                     >新密码</label
                   >
                   <BaseInput
@@ -409,11 +494,15 @@ async function saveEdit(): Promise<void> {
                     password-toggle
                     autocomplete="new-password"
                   />
-                  <p v-if="errors.newPassword" class="form-item__error">{{ errors.newPassword }}</p>
+                  <p v-if="errors.newPassword" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-danger">
+                    {{ errors.newPassword }}
+                  </p>
                 </div>
 
-                <div class="form-item">
-                  <label class="form-item__label form-item__label--required" for="confirm-password"
+                <div class="relative flex-1">
+                  <label
+                    class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+                    for="confirm-password"
                     >确认新密码</label
                   >
                   <BaseInput
@@ -426,7 +515,7 @@ async function saveEdit(): Promise<void> {
                     password-toggle
                     autocomplete="new-password"
                   />
-                  <p v-if="errors.confirmPassword" class="form-item__error">
+                  <p v-if="errors.confirmPassword" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-danger">
                     {{ errors.confirmPassword }}
                   </p>
                 </div>
@@ -442,228 +531,3 @@ async function saveEdit(): Promise<void> {
     </template>
   </div>
 </template>
-
-<style scoped>
-.profile {
-  display: flex;
-  gap: 15px;
-  align-items: flex-start;
-}
-
-.profile__side {
-  width: 280px;
-  flex-shrink: 0;
-}
-
-.profile__state {
-  width: 100%;
-}
-
-.profile__main {
-  flex: 1;
-  min-width: 0;
-}
-
-.profile__card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.profile__avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  margin-bottom: 12px;
-  font-size: 26px;
-  color: #fff;
-  background-color: var(--color-primary);
-  border-radius: 50%;
-}
-
-.profile__name {
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.profile__email {
-  margin: 4px 0 10px;
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  word-break: break-all;
-}
-
-.profile__role {
-  padding: 2px 10px;
-  font-size: 12px;
-  color: var(--color-primary);
-  background-color: var(--color-primary-light);
-  border-radius: 2px;
-}
-
-.profile__role.is-super {
-  color: var(--color-warning);
-  background-color: rgba(243, 156, 18, 0.14);
-}
-
-.profile__summary {
-  padding: 6px 15px 14px;
-}
-
-.profile__summary-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 7px 0;
-  font-size: 13px;
-  border-bottom: 1px dashed var(--color-border-lighter);
-}
-
-.profile__summary-item:last-child {
-  border-bottom: none;
-}
-
-.profile__summary-label {
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-}
-
-.profile__summary-value {
-  text-align: right;
-  word-break: break-all;
-}
-
-.profile__table th.profile__table-label {
-  width: 110px;
-  font-weight: normal;
-  color: var(--color-text-secondary);
-  background-color: transparent;
-  border-bottom: 1px solid var(--color-border-lighter);
-}
-
-.profile__phone {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-/* 行内编辑铅笔图标 */
-.profile__value {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.profile__edit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  color: var(--color-text-placeholder);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition:
-    color var(--transition),
-    background-color var(--transition);
-}
-
-.profile__edit:hover {
-  color: var(--color-primary);
-  background-color: var(--color-primary-light);
-}
-
-/* 行内编辑：输入框 + 保存 / 取消 */
-.profile__edit-box {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.profile__edit-input {
-  width: 180px;
-}
-
-.profile__edit-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  color: var(--color-text-secondary);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition:
-    color var(--transition),
-    background-color var(--transition);
-}
-
-.profile__edit-action:hover {
-  color: var(--color-primary);
-  background-color: var(--color-primary-light);
-}
-
-.profile__edit-action[disabled] {
-  color: var(--color-disabled-text);
-  cursor: not-allowed;
-  background-color: transparent;
-}
-
-.profile__tip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 15px;
-  padding: 8px 12px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  background-color: var(--color-surface-alt);
-  border-radius: var(--radius-sm);
-}
-
-.profile__form {
-  max-width: 720px;
-}
-
-.profile__code {
-  display: flex;
-  gap: 10px;
-}
-
-.profile__code .input-group {
-  flex: 1;
-}
-
-.profile__code .btn {
-  flex-shrink: 0;
-  width: 120px;
-}
-
-.profile__form-row {
-  display: flex;
-  gap: 20px;
-}
-
-.profile__form-row .form-item {
-  flex: 1;
-}
-
-@media (max-width: 900px) {
-  .profile {
-    flex-direction: column;
-  }
-
-  .profile__side {
-    width: 100%;
-  }
-
-  .profile__form-row {
-    flex-direction: column;
-    gap: 0;
-  }
-}
-</style>

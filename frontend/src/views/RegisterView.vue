@@ -39,9 +39,9 @@ const passwordStrength = computed(() => {
   if (value.length >= 8) score += 1
   if (/[a-zA-Z]/.test(value) && /\d/.test(value)) score += 1
   if (/[^a-zA-Z0-9]/.test(value) || value.length >= 12) score += 1
-  if (score <= 1) return { level: 1, text: '弱', color: 'var(--color-danger)' }
-  if (score === 2) return { level: 2, text: '中', color: 'var(--color-warning)' }
-  return { level: 3, text: '强', color: 'var(--color-success)' }
+  if (score <= 1) return { level: 1, text: '弱', color: 'var(--app-danger)' }
+  if (score === 2) return { level: 2, text: '中', color: 'var(--app-warning)' }
+  return { level: 3, text: '强', color: 'var(--app-success)' }
 })
 
 function validate(): boolean {
@@ -118,14 +118,25 @@ async function onSubmit(): Promise<void> {
 
 <template>
   <AuthLayout title="账号注册" subtitle="首个注册账号将自动成为超级管理员">
-    <form class="form" novalidate @submit.prevent="onSubmit">
-      <div v-if="errorMessage" class="auth__error">
+    <form
+      class="w-full [--checkbox-bg:rgba(255,255,255,0.15)] [--checkbox-border:rgba(255,255,255,0.5)] [--checkbox-color:rgba(255,255,255,0.85)] [--error-color:#ffd7d7] [--input-bg:#fff] [--input-placeholder:#bbb] [--label-color:rgba(255,255,255,0.85)]"
+      novalidate
+      @submit.prevent="onSubmit"
+    >
+      <div
+        v-if="errorMessage"
+        class="mb-4 flex items-center gap-1.5 rounded-sm bg-[rgba(221,75,57,0.75)] px-3 py-2 text-sm text-[#ffecec]"
+      >
         <FaIcon name="exclamation-circle" :size="15" />
         <span>{{ errorMessage }}</span>
       </div>
 
-      <div class="form-item">
-        <label class="form-item__label form-item__label--required" for="register-name">姓名</label>
+      <div class="relative mb-5">
+        <label
+          class="mb-1.5 block text-sm text-[var(--label-color)] before:mr-1 before:text-danger before:content-['*']"
+          for="register-name"
+          >姓名</label
+        >
         <BaseInput
           id="register-name"
           v-model="name"
@@ -134,11 +145,17 @@ async function onSubmit(): Promise<void> {
           :error="errors.name"
           autocomplete="name"
         />
-        <p v-if="errors.name" class="form-item__error">{{ errors.name }}</p>
+        <p v-if="errors.name" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-[var(--error-color)]">
+          {{ errors.name }}
+        </p>
       </div>
 
-      <div class="form-item">
-        <label class="form-item__label form-item__label--required" for="register-email">邮箱</label>
+      <div class="relative mb-5">
+        <label
+          class="mb-1.5 block text-sm text-[var(--label-color)] before:mr-1 before:text-danger before:content-['*']"
+          for="register-email"
+          >邮箱</label
+        >
         <BaseInput
           id="register-email"
           v-model="email"
@@ -148,11 +165,13 @@ async function onSubmit(): Promise<void> {
           :error="errors.email"
           autocomplete="email"
         />
-        <p v-if="errors.email" class="form-item__error">{{ errors.email }}</p>
+        <p v-if="errors.email" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-[var(--error-color)]">
+          {{ errors.email }}
+        </p>
       </div>
 
-      <div class="form-item">
-        <label class="form-item__label" for="register-phone">手机号</label>
+      <div class="relative mb-5">
+        <label class="mb-1.5 block text-sm text-[var(--label-color)]" for="register-phone">手机号</label>
         <BaseInput
           id="register-phone"
           v-model="phone"
@@ -162,11 +181,13 @@ async function onSubmit(): Promise<void> {
         />
       </div>
 
-      <div class="form-item">
-        <label class="form-item__label form-item__label--required" for="register-code"
+      <div class="relative mb-5">
+        <label
+          class="mb-1.5 block text-sm text-[var(--label-color)] before:mr-1 before:text-danger before:content-['*']"
+          for="register-code"
           >邮箱验证码</label
         >
-        <div class="auth__code">
+        <div class="flex gap-2.5">
           <BaseInput
             id="register-code"
             v-model="code"
@@ -174,8 +195,10 @@ async function onSubmit(): Promise<void> {
             placeholder="6 位数字验证码"
             :error="errors.code"
             autocomplete="one-time-code"
+            class="flex-1"
           />
           <BaseButton
+            class="w-[120px] shrink-0"
             :disabled="countdown > 0"
             :loading="sending"
             type="primary"
@@ -185,11 +208,15 @@ async function onSubmit(): Promise<void> {
             {{ countdown > 0 ? `${countdown}s 后重发` : '获取验证码' }}
           </BaseButton>
         </div>
-        <p v-if="errors.code" class="form-item__error">{{ errors.code }}</p>
+        <p v-if="errors.code" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-[var(--error-color)]">
+          {{ errors.code }}
+        </p>
       </div>
 
-      <div class="form-item">
-        <label class="form-item__label form-item__label--required" for="register-password"
+      <div class="relative mb-5">
+        <label
+          class="mb-1.5 block text-sm text-[var(--label-color)] before:mr-1 before:text-danger before:content-['*']"
+          for="register-password"
           >密码</label
         >
         <BaseInput
@@ -202,16 +229,18 @@ async function onSubmit(): Promise<void> {
           password-toggle
           autocomplete="new-password"
         />
-        <p v-if="errors.password" class="form-item__error">{{ errors.password }}</p>
-        <p v-else-if="passwordStrength.level" class="form-item__tip">
-          密码强度：<span :style="{ color: passwordStrength.color }">{{
-            passwordStrength.text
-          }}</span>
+        <p v-if="errors.password" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-[var(--error-color)]">
+          {{ errors.password }}
+        </p>
+        <p v-else-if="passwordStrength.level" class="mt-1.5 text-xs text-[var(--tip-color)]">
+          密码强度：<span :style="{ color: passwordStrength.color }">{{ passwordStrength.text }}</span>
         </p>
       </div>
 
-      <div class="form-item">
-        <label class="form-item__label form-item__label--required" for="register-password-confirm"
+      <div class="relative mb-5">
+        <label
+          class="mb-1.5 block text-sm text-[var(--label-color)] before:mr-1 before:text-danger before:content-['*']"
+          for="register-password-confirm"
           >确认密码</label
         >
         <BaseInput
@@ -224,14 +253,18 @@ async function onSubmit(): Promise<void> {
           password-toggle
           autocomplete="new-password"
         />
-        <p v-if="errors.passwordConfirm" class="form-item__error">{{ errors.passwordConfirm }}</p>
+        <p v-if="errors.passwordConfirm" class="absolute top-full right-0 mt-0.5 text-xs leading-[1.4] text-[var(--error-color)]">
+          {{ errors.passwordConfirm }}
+        </p>
       </div>
 
       <BaseButton type="primary" size="large" block :loading="submitting" native-type="submit">
         {{ submitting ? '注册中...' : '注 册' }}
       </BaseButton>
 
-      <p class="auth__tip">已有账号？<router-link to="/login">返回登录</router-link></p>
+      <p class="mt-[18px] text-center text-sm text-white/85">
+        已有账号？<router-link class="text-white" to="/login">返回登录</router-link>
+      </p>
     </form>
   </AuthLayout>
 </template>

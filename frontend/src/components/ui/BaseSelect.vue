@@ -31,10 +31,10 @@ function onChange(event: Event): void {
 </script>
 
 <template>
-  <div class="select" :class="{ 'is-disabled': props.disabled }">
+  <div class="relative flex items-center" :class="{ 'opacity-70': props.disabled }">
     <select
       :id="props.id"
-      class="select__control"
+      class="h-control w-full cursor-pointer appearance-none rounded border border-border bg-surface py-1.5 pl-3 pr-[30px] text-base text-text transition-[border-color,box-shadow] duration-300 ease hover:border-primary-border focus:border-primary focus:shadow-[0_0_0_2px_var(--app-primary-light)] focus:outline-none disabled:cursor-not-allowed disabled:bg-disabled-bg disabled:text-disabled-text"
       :value="props.modelValue"
       :disabled="props.disabled"
       @change="onChange"
@@ -44,6 +44,6 @@ function onChange(event: Event): void {
         {{ item.label }}
       </option>
     </select>
-    <FaIcon class="select__arrow" name="chevron-down" :size="14" />
+    <FaIcon class="pointer-events-none absolute right-2.5 text-text-placeholder" name="chevron-down" :size="14" />
   </div>
 </template>

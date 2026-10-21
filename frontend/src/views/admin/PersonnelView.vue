@@ -60,7 +60,6 @@ const PERMISSIONS = [
   { key: 'admin:update', label: '人员管理（编辑）' },
   { key: 'admin:status', label: '人员管理（启用/禁用）' },
   { key: 'admin:role', label: '人员管理（分配角色）' },
-  { key: 'admin:delete', label: '人员管理（删除）' },
   { key: 'menu:manage', label: '菜单与权限管理' },
   { key: 'log:view', label: '操作日志查看' },
 ]
@@ -270,46 +269,48 @@ async function onSavePermission(): Promise<void> {
 </script>
 
 <template>
-  <div class="personnel">
+  <div>
     <!-- 概览 -->
-    <div class="personnel__stats">
-      <div class="card personnel__stat">
-        <div class="card__body">
-          <p class="personnel__stat-value">{{ summary.total }}</p>
-          <p class="personnel__stat-label">人员总数</p>
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-[15px]">
+      <div class="rounded border border-border bg-surface shadow-card">
+        <div class="p-[15px]">
+          <p class="text-[22px] leading-[1.3] font-medium">{{ summary.total }}</p>
+          <p class="text-xs text-text-secondary">人员总数</p>
         </div>
       </div>
-      <div class="card personnel__stat">
-        <div class="card__body">
-          <p class="personnel__stat-value text-success">{{ summary.full_time }}</p>
-          <p class="personnel__stat-label">正式员工</p>
+      <div class="rounded border border-border bg-surface shadow-card">
+        <div class="p-[15px]">
+          <p class="text-[22px] leading-[1.3] font-medium text-success">{{ summary.full_time }}</p>
+          <p class="text-xs text-text-secondary">正式员工</p>
         </div>
       </div>
-      <div class="card personnel__stat">
-        <div class="card__body">
-          <p class="personnel__stat-value text-warning">{{ summary.outsource }}</p>
-          <p class="personnel__stat-label">外包</p>
+      <div class="rounded border border-border bg-surface shadow-card">
+        <div class="p-[15px]">
+          <p class="text-[22px] leading-[1.3] font-medium text-warning">{{ summary.outsource }}</p>
+          <p class="text-xs text-text-secondary">外包</p>
         </div>
       </div>
-      <div class="card personnel__stat">
-        <div class="card__body">
-          <p class="personnel__stat-value text-primary">{{ summary.part_time }}</p>
-          <p class="personnel__stat-label">兼职</p>
+      <div class="rounded border border-border bg-surface shadow-card">
+        <div class="p-[15px]">
+          <p class="text-[22px] leading-[1.3] font-medium text-primary">{{ summary.part_time }}</p>
+          <p class="text-xs text-text-secondary">兼职</p>
         </div>
       </div>
-      <div class="card personnel__stat">
-        <div class="card__body">
-          <p class="personnel__stat-value">{{ summary.active }}</p>
-          <p class="personnel__stat-label">启用中</p>
+      <div class="rounded border border-border bg-surface shadow-card">
+        <div class="p-[15px]">
+          <p class="text-[22px] leading-[1.3] font-medium">{{ summary.active }}</p>
+          <p class="text-xs text-text-secondary">启用中</p>
         </div>
       </div>
     </div>
 
     <!-- 列表 -->
-    <div class="card mt15">
-      <div class="card__header">
+    <div class="mt-[15px] rounded border border-border bg-surface shadow-card">
+      <div
+        class="flex h-[41px] items-center justify-between border-b border-border-lighter bg-card-header-bg px-[15px] text-base"
+      >
         <span>人员列表</span>
-        <div class="flex gap10">
+        <div class="flex gap-2.5">
           <BaseButton size="small" title="刷新列表" @click="onRefresh">
             <template #icon><FaIcon name="refresh" :size="14" /></template>
             刷新
@@ -322,9 +323,9 @@ async function onSavePermission(): Promise<void> {
       </div>
 
       <!-- 筛选 -->
-      <div class="card__body personnel__filter">
-        <div class="personnel__filter-item">
-          <label class="personnel__filter-label">关键字</label>
+      <div class="flex flex-wrap items-end gap-x-[15px] gap-y-3 px-[15px] pt-[15px] pb-0">
+        <div class="w-[180px] max-[900px]:w-full">
+          <label class="mb-1.5 block text-xs text-text-secondary">关键字</label>
           <BaseInput
             v-model="filters.keyword"
             icon="user"
@@ -332,30 +333,32 @@ async function onSavePermission(): Promise<void> {
             @keyup.enter="onSearch"
           />
         </div>
-        <div class="personnel__filter-item">
-          <label class="personnel__filter-label">角色</label>
+        <div class="w-[180px] max-[900px]:w-full">
+          <label class="mb-1.5 block text-xs text-text-secondary">角色</label>
           <BaseSelect v-model="filters.role" :options="ROLE_OPTIONS" placeholder="全部角色" />
         </div>
-        <div class="personnel__filter-item">
-          <label class="personnel__filter-label">人员类型</label>
+        <div class="w-[180px] max-[900px]:w-full">
+          <label class="mb-1.5 block text-xs text-text-secondary">人员类型</label>
           <BaseSelect
             v-model="filters.employment_type"
             :options="EMPLOYMENT_OPTIONS"
             placeholder="全部类型"
           />
         </div>
-        <div class="personnel__filter-item">
-          <label class="personnel__filter-label">状态</label>
+        <div class="w-[180px] max-[900px]:w-full">
+          <label class="mb-1.5 block text-xs text-text-secondary">状态</label>
           <BaseSelect v-model="filters.status" :options="STATUS_OPTIONS" placeholder="全部状态" />
         </div>
-        <div class="personnel__filter-actions">
+        <div class="flex gap-2">
           <BaseButton type="primary" @click="onSearch">查询</BaseButton>
           <BaseButton @click="onReset">重置</BaseButton>
         </div>
       </div>
 
       <!-- 表格 -->
-      <table class="table personnel__table">
+      <table
+        class="w-full text-sm text-text [&_th]:border-b [&_th]:border-[#ccc] [&_th]:px-2 [&_th]:py-2 [&_th]:text-left [&_th]:font-normal [&_th]:align-middle [&_td]:border-b [&_td]:border-border-lighter [&_td]:px-2 [&_td]:py-2 [&_td]:align-middle [&>tbody>tr>td:hover]:bg-hover"
+      >
         <thead>
           <tr>
             <th>姓名</th>
@@ -366,24 +369,27 @@ async function onSavePermission(): Promise<void> {
             <th>状态</th>
             <th>最近登录</th>
             <th>创建时间</th>
-            <th class="personnel__table-actions">操作</th>
+            <th class="w-[220px]">操作</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in list" :key="item.id">
             <td>
-              <div class="personnel__user">
-                <span class="personnel__avatar">{{ item.name.charAt(0) }}</span>
-                <div class="personnel__user-info">
-                  <p class="personnel__user-name">{{ item.name }}</p>
-                  <p class="personnel__user-id">ID：{{ item.id }}</p>
+              <div class="flex items-center gap-2.25">
+                <span
+                  class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-full bg-primary text-[13px] text-white"
+                  >{{ item.name.charAt(0) }}</span
+                >
+                <div>
+                  <p class="font-medium">{{ item.name }}</p>
+                  <p class="text-xs text-text-placeholder">ID：{{ item.id }}</p>
                 </div>
               </div>
             </td>
             <td>{{ item.email }}</td>
             <td>
               <span v-if="item.phone">{{ item.phone }}</span>
-              <span v-else class="text-placeholder">未填写</span>
+              <span v-else class="text-text-placeholder">未填写</span>
             </td>
             <td>
               <BaseTag
@@ -418,16 +424,20 @@ async function onSavePermission(): Promise<void> {
             </td>
             <td>
               <p>{{ formatDateTime(item.last_login_at) }}</p>
-              <p v-if="item.last_login_ip" class="personnel__ip">{{ item.last_login_ip }}</p>
+              <p v-if="item.last_login_ip" class="text-xs text-text-placeholder">{{ item.last_login_ip }}</p>
             </td>
             <td>{{ formatDateTime(item.created_at) }}</td>
             <td>
-              <div class="table__actions personnel__actions">
-                <button class="personnel__action" title="编辑" @click="openEdit(item)">
+              <div class="flex flex-wrap items-center gap-1.25">
+                <button
+                  class="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm text-[13px] text-primary transition-all duration-300 ease hover:bg-primary-light hover:text-primary-active"
+                  title="编辑"
+                  @click="openEdit(item)"
+                >
                   <FaIcon name="edit" :size="14" />
                 </button>
                 <button
-                  class="personnel__action"
+                  class="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm text-[13px] text-primary transition-all duration-300 ease hover:bg-primary-light hover:text-primary-active"
                   :title="item.status === 'ACTIVE' ? '禁用' : '启用'"
                   @click="onToggleStatus(item)"
                 >
@@ -435,7 +445,7 @@ async function onSavePermission(): Promise<void> {
                 </button>
                 <button
                   v-if="isSuperAdmin"
-                  class="personnel__action"
+                  class="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm text-[13px] text-primary transition-all duration-300 ease hover:bg-primary-light hover:text-primary-active"
                   title="分配权限"
                   @click="openPermission(item)"
                 >
@@ -443,7 +453,7 @@ async function onSavePermission(): Promise<void> {
                 </button>
                 <button
                   v-if="isSuperAdmin"
-                  class="personnel__action personnel__action--danger"
+                  class="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm text-[13px] text-danger transition-all duration-300 ease hover:bg-[rgba(237,85,101,0.12)] hover:text-danger-active"
                   title="删除"
                   @click="onRemove(item)"
                 >
@@ -453,26 +463,36 @@ async function onSavePermission(): Promise<void> {
             </td>
           </tr>
           <tr v-if="!loading && list.length === 0">
-            <td colspan="9" class="personnel__empty">暂无数据</td>
+            <td colspan="9" class="py-[30px] text-center text-text-placeholder">暂无数据</td>
           </tr>
         </tbody>
       </table>
 
-      <div class="card__body">
+      <div class="p-[15px]">
         <BasePagination v-model="page" v-model:page-size="pageSize" :total="total" />
       </div>
     </div>
 
     <!-- 新增 / 编辑人员 -->
-    <BaseModal v-model="dialogVisible" :title="dialogMode === 'create' ? '新增人员' : '编辑人员'">
-      <form class="form" @submit.prevent="onSubmit">
-        <div class="personnel__form-row">
-          <div class="form-item">
-            <label class="form-item__label form-item__label--required" for="p-name">姓名</label>
+    <BaseModal
+      v-model="dialogVisible"
+      size="md"
+      :title="dialogMode === 'create' ? '新增人员' : '编辑人员'"
+    >
+      <form class="w-full" @submit.prevent="onSubmit">
+        <div class="flex gap-[15px] max-[900px]:flex-col max-[900px]:gap-0">
+          <div class="relative flex-1">
+            <label
+              class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+              for="p-name"
+              >姓名</label
+            >
             <BaseInput id="p-name" v-model="form.name" icon="user" placeholder="请输入姓名" />
           </div>
-          <div class="form-item">
-            <label class="form-item__label form-item__label--required" for="p-email"
+          <div class="relative flex-1">
+            <label
+              class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+              for="p-email"
               >登录邮箱</label
             >
             <BaseInput
@@ -483,8 +503,8 @@ async function onSavePermission(): Promise<void> {
               placeholder="请输入邮箱"
             />
           </div>
-          <div class="form-item">
-            <label class="form-item__label" for="p-phone">手机号</label>
+          <div class="relative flex-1">
+            <label class="mb-1.5 block text-sm text-text-secondary" for="p-phone">手机号</label>
             <BaseInput
               id="p-phone"
               v-model="form.phone"
@@ -494,13 +514,21 @@ async function onSavePermission(): Promise<void> {
           </div>
         </div>
 
-        <div class="personnel__form-row">
-          <div class="form-item">
-            <label class="form-item__label form-item__label--required" for="p-type">人员类型</label>
+        <div class="flex gap-[15px] max-[900px]:flex-col max-[900px]:gap-0">
+          <div class="relative flex-1">
+            <label
+              class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+              for="p-type"
+              >人员类型</label
+            >
             <BaseSelect id="p-type" v-model="form.employment_type" :options="EMPLOYMENT_OPTIONS" />
           </div>
-          <div class="form-item">
-            <label class="form-item__label form-item__label--required" for="p-role">角色</label>
+          <div class="relative flex-1">
+            <label
+              class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+              for="p-role"
+              >角色</label
+            >
             <BaseSelect
               id="p-role"
               v-model="form.role"
@@ -511,15 +539,19 @@ async function onSavePermission(): Promise<void> {
           </div>
         </div>
 
-        <div class="personnel__form-row">
-          <div class="form-item">
-            <label class="form-item__label form-item__label--required" for="p-status"
+        <div class="flex gap-[15px] max-[900px]:flex-col max-[900px]:gap-0">
+          <div class="relative flex-1">
+            <label
+              class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+              for="p-status"
               >账号状态</label
             >
             <BaseSelect id="p-status" v-model="form.status" :options="STATUS_OPTIONS" />
           </div>
-          <div v-if="dialogMode === 'create'" class="form-item">
-            <label class="form-item__label form-item__label--required" for="p-password"
+          <div v-if="dialogMode === 'create'" class="relative flex-1">
+            <label
+              class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+              for="p-password"
               >初始密码</label
             >
             <BaseInput
@@ -542,19 +574,25 @@ async function onSavePermission(): Promise<void> {
 
     <!-- 分配角色与权限（仅超级管理员） -->
     <BaseModal v-model="permissionVisible" title="分配角色与权限" size="md">
-      <p class="personnel__permission-target">
+      <p class="mb-[15px] text-sm text-text-secondary">
         正在为 <strong>{{ permissionTarget?.name }}</strong
         >（{{ permissionTarget?.email }}）分配权限
       </p>
 
-      <div class="form-item">
-        <label class="form-item__label form-item__label--required" for="perm-role">角色</label>
+      <div class="relative mb-5">
+        <label
+          class="mb-1.5 block text-sm text-text-secondary before:mr-1 before:text-danger before:content-['*']"
+          for="perm-role"
+          >角色</label
+        >
         <BaseSelect id="perm-role" v-model="permissionRole" :options="ROLE_OPTIONS" />
       </div>
 
-      <div class="form-item">
-        <span class="form-item__label">功能权限</span>
-        <div class="personnel__permissions">
+      <div class="relative mb-5">
+        <span class="mb-1.5 block text-sm text-text-secondary">功能权限</span>
+        <div
+          class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2.5 rounded-sm bg-surface-alt p-3"
+        >
           <BaseCheckbox
             v-for="item in PERMISSIONS"
             :key="item.key"
@@ -578,156 +616,3 @@ async function onSavePermission(): Promise<void> {
     </BaseModal>
   </div>
 </template>
-
-<style scoped>
-.personnel__stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 15px;
-}
-
-.personnel__stat-value {
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-.personnel__stat-label {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.personnel__filter {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 15px;
-  align-items: flex-end;
-  padding-bottom: 0;
-}
-
-.personnel__filter-item {
-  width: 180px;
-}
-
-.personnel__filter-label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.personnel__filter-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.personnel__table th,
-.personnel__table td {
-  vertical-align: middle;
-}
-
-.personnel__table-actions {
-  width: 220px;
-}
-
-.personnel__user {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.personnel__avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  font-size: 13px;
-  color: #fff;
-  background-color: var(--color-primary);
-  border-radius: 50%;
-}
-
-.personnel__user-name {
-  font-weight: 500;
-}
-
-.personnel__user-id,
-.personnel__ip {
-  font-size: 12px;
-  color: var(--color-text-placeholder);
-}
-
-.personnel__actions {
-  flex-wrap: wrap;
-}
-
-.personnel__action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  font-size: 13px;
-  color: var(--color-primary);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition:
-    color var(--transition),
-    background-color var(--transition);
-}
-
-.personnel__action:hover {
-  color: var(--color-primary-active);
-  background-color: var(--color-primary-light);
-}
-
-.personnel__action--danger {
-  color: var(--color-danger);
-}
-
-.personnel__action--danger:hover {
-  color: var(--color-danger-active);
-}
-
-.personnel__empty {
-  padding: 30px 0;
-  text-align: center;
-  color: var(--color-text-placeholder);
-}
-
-.personnel__form-row {
-  display: flex;
-  gap: 15px;
-}
-
-.personnel__form-row .form-item {
-  flex: 1;
-}
-
-.personnel__permission-target {
-  margin-bottom: 15px;
-  font-size: 13px;
-  color: var(--color-text-secondary);
-}
-
-.personnel__permissions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-  padding: 12px;
-  background-color: var(--color-surface-alt);
-  border-radius: var(--radius-sm);
-}
-
-@media (max-width: 900px) {
-  .personnel__form-row {
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .personnel__filter-item {
-    width: 100%;
-  }
-}
-</style>

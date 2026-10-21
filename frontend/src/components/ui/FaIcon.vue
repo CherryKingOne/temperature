@@ -10,18 +10,9 @@ const props = withDefaults(defineProps<{ name: string; size?: number }>(), {
 
 <template>
   <i
-    class="fa"
+    class="fa inline-block shrink-0 align-middle leading-none"
     :class="`fa-${props.name}`"
     :style="{ fontSize: `${props.size}px` }"
     aria-hidden="true"
   />
 </template>
-
-<style scoped>
-.fa {
-  display: inline-block;
-  line-height: 1;
-  vertical-align: middle;
-  flex-shrink: 0;
-}
-</style>
